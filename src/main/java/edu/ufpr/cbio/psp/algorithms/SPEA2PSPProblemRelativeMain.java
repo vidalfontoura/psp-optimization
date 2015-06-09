@@ -10,22 +10,25 @@ import org.uma.jmetal.operator.crossover.Crossover;
 import org.uma.jmetal.operator.crossover.SinglePointCrossover;
 import org.uma.jmetal.operator.mutation.BitFlipMutation;
 import org.uma.jmetal.operator.mutation.Mutation;
+import org.uma.jmetal.operator.mutation.PolynomialMutation;
 import org.uma.jmetal.operator.selection.BinaryTournament2;
 import org.uma.jmetal.operator.selection.Selection;
 import org.uma.jmetal.util.fileoutput.SolutionSetOutput;
 
 import edu.ufpr.cbio.psp.problem.PSPProblem;
+import edu.ufpr.cbio.psp.problem.custom.operators.IntegerTwoPointsCrossover;
+import edu.ufpr.cbio.psp.problem.custom.operators.UniformCrossover;
 
 public class SPEA2PSPProblemRelativeMain {
 
     public static void main(String[] args) throws Exception {
 
-        File file = new File("psp_experiments");
+        File file = new File("results");
         if (!file.exists()) {
             file.mkdir();
         }
 
-        String path = "psp_experiments/tmp_experiments";
+        String path = file.getPath()+File.separator+"PSP";
         String algorithms = "SPEA2";
         int executions = 30;
 
@@ -51,13 +54,18 @@ public class SPEA2PSPProblemRelativeMain {
         builder.setArchiveSize(archiveSize);
 
         double crossoverProbability = 0.9;
-        double crossoverDistributionIndex = 20.0;
-        Crossover crossover = new SinglePointCrossover.Builder().setProbability(crossoverProbability).build();
+//        double crossoverDistributionIndex = 20.0;
+        Crossover crossover;
+//        crossover = new SinglePointCrossover.Builder().setProbability(crossoverProbability).build();
+//        crossover = new IntegerTwoPointsCrossover.Builder().crossoverProbability(crossoverProbability).build();
+        crossover = new UniformCrossover.Builder().crossoverProbability(crossoverProbability).build();
         builder.setCrossover(crossover);
 
-        double mutationProbability = 1.0 / problem.getNumberOfVariables();
-        double mutationDistributionIndex = 20.0;
-        Mutation mutation = new BitFlipMutation.Builder().setProbability(mutationProbability).build();
+        double mutationProbability = 0.01;
+//        double mutationDistributionIndex = 20.0;
+        Mutation mutation;
+//        mutation = new BitFlipMutation.Builder().setProbability(mutationProbability).build();
+        mutation = new PolynomialMutation.Builder().build();
         builder.setMutation(mutation);
 
         Selection selection = new BinaryTournament2.Builder().build();
@@ -65,6 +73,8 @@ public class SPEA2PSPProblemRelativeMain {
 
         algorithm = builder.build();
 
+        algorithms += "_" + crossover.getClass().getSimpleName() +"_"+ mutation.getClass().getSimpleName();
+        
         File rootDir = createDir(path);
         File algorithmDir = createDir(rootDir.getPath() + File.separator + algorithms + File.separator);
         File objectivesDir = createDir(algorithmDir.getPath() + File.separator);
@@ -90,13 +100,13 @@ public class SPEA2PSPProblemRelativeMain {
 
             problem.removeDominateds(population);
             problem.removeDuplicates(population);
-
+            
             SolutionSetOutput.printVariablesToFile(population, executionDirectory + File.separator + "VAR.txt");
             SolutionSetOutput.printObjectivesToFile(population, executionDirectory + File.separator + "FUN.txt");
 
             allRuns = allRuns.union(population);
         }
-
+        
         System.out.println();
         System.out.println("End of execution for problem " + problem.getClass().getName() + ".");
         System.out.println("Total time (seconds): " + allExecutionTime / 1000);

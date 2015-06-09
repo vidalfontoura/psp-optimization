@@ -1,29 +1,28 @@
-package edu.ufpr.cbio.psp.algorithms;
+package edu.ufpr.cbio.psp.algorithms.main;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.uma.jmetal.core.Algorithm;
 import org.uma.jmetal.core.SolutionSet;
-import org.uma.jmetal.metaheuristic.multiobjective.ibea.IBEA;
 import org.uma.jmetal.operator.crossover.Crossover;
 import org.uma.jmetal.operator.crossover.SinglePointCrossover;
 import org.uma.jmetal.operator.mutation.BitFlipMutation;
 import org.uma.jmetal.operator.mutation.Mutation;
-import org.uma.jmetal.operator.mutation.PolynomialBitFlipMutation;
-import org.uma.jmetal.operator.mutation.PolynomialMutation;
-import org.uma.jmetal.operator.mutation.UniformMutation;
 import org.uma.jmetal.operator.selection.BinaryTournament;
 import org.uma.jmetal.util.comparator.FitnessComparator;
 import org.uma.jmetal.util.fileoutput.SolutionSetOutput;
 
+import edu.ufpr.cbio.psp.algorithms.hyperheuristic.IBEAHyperHeuristic;
+import edu.ufpr.cbio.psp.algorithms.hyperheuristic.LowLevelHeuristic;
 import edu.ufpr.cbio.psp.problem.PSPProblem;
 import edu.ufpr.cbio.psp.problem.custom.operators.IntegerTwoPointsCrossover;
 import edu.ufpr.cbio.psp.problem.custom.operators.UniformCrossover;
 
-public class IBEAPSPProblemRelativeMain {
+public class IBEAHyperHeuristicPSPMain {
 
-    public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 
         File file = new File("results");
         if (!file.exists()) {
@@ -31,20 +30,18 @@ public class IBEAPSPProblemRelativeMain {
         }
 
         String path = file.getPath()+File.separator+"PSP";
-        String algorithms = "IBEA";
+        String algorithms = "IBEAHH";
         int executions = 30;
 
         PSPProblem problem; // The problem to solve
         Algorithm algorithm; // The algorithm to use
-
-        HashMap<String, Double> parameters; // Operator parameters
 
         String proteinChain =
             "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
         int numberOfObjectives = 2;
         problem = new PSPProblem(proteinChain, numberOfObjectives);
 
-        IBEA.Builder builder = new IBEA.Builder(problem);
+        IBEAHyperHeuristic.Builder builder = new IBEAHyperHeuristic.Builder(problem);
 
         int populationSize = 100;
         builder.setPopulationSize(populationSize);
@@ -56,27 +53,27 @@ public class IBEAPSPProblemRelativeMain {
         builder.setArchiveSize(archiveSize);
 
         double crossoverProbability = 0.9;
-//        double crossoverDistributionIndex = 20.0;
-        Crossover crossover;
-//        crossover = new SinglePointCrossover.Builder().setProbability(crossoverProbability).build();
-//        crossover = new IntegerTwoPointsCrossover.Builder().crossoverProbability(crossoverProbability).build();
-        crossover = new UniformCrossover.Builder().crossoverProbability(crossoverProbability).build();
-        builder.setCrossover(crossover);
+        
+        List<Crossover> listCrossover = new ArrayList<Crossover>();
+        listCrossover.add(new SinglePointCrossover.Builder().setProbability(crossoverProbability).build());
+        listCrossover.add(new IntegerTwoPointsCrossover.Builder().crossoverProbability(crossoverProbability).build());
+        listCrossover.add(new UniformCrossover.Builder().crossoverProbability(crossoverProbability).build());
 
-        double mutationProbability = 0.01;
-//        double mutationDistributionIndex = 20.0;
-        Mutation mutation;
-//        mutation = new BitFlipMutation.Builder().setProbability(mutationProbability).build();
-        mutation = new PolynomialMutation.Builder().build();
-//        mutation = null;
-        builder.setMutation(mutation);
+        double mutationProbability = 0.01;//1.0 / problem.getNumberOfVariables();
+        
+        List<Mutation> listMutation = new ArrayList<Mutation>();
+        listMutation.add(new BitFlipMutation.Builder().setProbability(mutationProbability).build());
+        //listMutation.add(new UniformMutation.Builder(mutationDistributionIndex, mutationProbability).build());//Nao roda pra IntSolution
+        listMutation.add(null);
+
+        List<LowLevelHeuristic> lowLevelHeuristics = generateLowLevelHeuristics(listCrossover, listMutation);
+        
+        builder.setLowLevelHeuristics(lowLevelHeuristics);
 
         builder.setSelection(new BinaryTournament.Builder().setComparator(new FitnessComparator()).build());
 
         algorithm = builder.build();
 
-        algorithms += "_" + crossover.getClass().getSimpleName() +"_"+ mutation.getClass().getSimpleName();
-        
         File rootDir = createDir(path);
         File algorithmDir = createDir(rootDir.getPath() + File.separator + algorithms + File.separator);
         File objectivesDir = createDir(algorithmDir.getPath() + File.separator);
@@ -128,5 +125,28 @@ public class IBEAPSPProblemRelativeMain {
             file.mkdir();
         }
         return file;
+    }
+
+    public static List<LowLevelHeuristic> generateLowLevelHeuristics(List<Crossover> listCrossover, List<Mutation> listMutation) {
+    	
+    	List<LowLevelHeuristic> lowLevelHeuristics = new ArrayList<LowLevelHeuristic>();
+    	
+    	for (Crossover crossover : listCrossover) {
+			for (Mutation mutation : listMutation) {
+				LowLevelHeuristic lowLevelHeuristic = new LowLevelHeuristic();
+
+				if(mutation != null)
+					lowLevelHeuristic.setName(crossover.getClass().getSimpleName()+"_"+mutation.getClass().getSimpleName());
+				else
+					lowLevelHeuristic.setName(crossover.getClass().getSimpleName()+"_NullMutation");
+				lowLevelHeuristic.setCrossover(crossover);
+				lowLevelHeuristic.setMutation(mutation);
+				lowLevelHeuristics.add(lowLevelHeuristic);
+				
+				System.out.println(lowLevelHeuristic.getName());
+			}
+		}
+    	
+    	return lowLevelHeuristics;
     }
 }

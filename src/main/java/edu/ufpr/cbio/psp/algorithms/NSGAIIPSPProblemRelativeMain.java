@@ -8,6 +8,7 @@ import org.uma.jmetal.core.Operator;
 import org.uma.jmetal.core.SolutionSet;
 import org.uma.jmetal.metaheuristic.multiobjective.nsgaII.NSGAIITemplate;
 import org.uma.jmetal.operator.crossover.SinglePointCrossover;
+import org.uma.jmetal.operator.crossover.TwoPointsCrossover;
 import org.uma.jmetal.operator.mutation.BitFlipMutation;
 import org.uma.jmetal.operator.selection.BinaryTournament2;
 import org.uma.jmetal.util.evaluator.SequentialSolutionSetEvaluator;
@@ -78,6 +79,8 @@ public class NSGAIIPSPProblemRelativeMain {
 
             // Execute the Algorithm
             System.out.println("Execution: " + (i + 1));
+            System.out.println(mutation.toString());
+            System.out.println(crossover.toString());
             long initTime = System.currentTimeMillis();
             SolutionSet population = algorithm.execute();
             long estimatedTime = System.currentTimeMillis() - initTime;

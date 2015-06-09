@@ -33,8 +33,8 @@ public class IntegerTwoPointsCrossover extends Crossover{
 		offspring[0] = new Solution(parent1);
 		offspring[1] = new Solution(parent2);
 
-		if (parent1.getType().getClass() == IntSolutionType.class) {
-			if (PseudoRandom.randDouble() < probability) {
+		if (PseudoRandom.randDouble() < probability) {
+			if (parent1.getType().getClass() == IntSolutionType.class) {
 				int crosspoint1;
 				int crosspoint2;
 				int permutationLength;
@@ -70,15 +70,14 @@ public class IntegerTwoPointsCrossover extends Crossover{
 					offspring1Vector[i] = parent2Vector[i];
 					offspring2Vector[i] = parent1Vector[i];
 				}
-				
+			} else {
+				JMetalLogger.logger.severe("TwoPointsCrossover.doCrossover: invalid " +
+						"type" +
+						parent1.getType().getClass());
+				Class<String> cls = java.lang.String.class;
+				String name = cls.getName();
+				throw new JMetalException("Exception in " + name + ".doCrossover()");
 			}
-		} else {
-			JMetalLogger.logger.severe("TwoPointsCrossover.doCrossover: invalid " +
-					"type" +
-					parent1.getType().getClass());
-			Class<String> cls = java.lang.String.class;
-			String name = cls.getName();
-			throw new JMetalException("Exception in " + name + ".doCrossover()");
 		}
 
 		return offspring;
