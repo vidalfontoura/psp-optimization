@@ -58,24 +58,23 @@ public class IBEAPSPProblemRelativeMain {
         double crossoverProbability = 0.9;
 //        double crossoverDistributionIndex = 20.0;
         Crossover crossover;
-//        crossover = new SinglePointCrossover.Builder().setProbability(crossoverProbability).build();
-//        crossover = new IntegerTwoPointsCrossover.Builder().crossoverProbability(crossoverProbability).build();
-        crossover = new UniformCrossover.Builder().crossoverProbability(crossoverProbability).build();
+//        crossover = new SinglePointCrossover.Builder().setProbability(crossoverProbability).build();//1
+//        crossover = new IntegerTwoPointsCrossover.Builder().crossoverProbability(crossoverProbability).build();//2
+        crossover = new UniformCrossover.Builder().crossoverProbability(crossoverProbability).build();//3
         builder.setCrossover(crossover);
 
         double mutationProbability = 0.01;
 //        double mutationDistributionIndex = 20.0;
         Mutation mutation;
 //        mutation = new BitFlipMutation.Builder().setProbability(mutationProbability).build();
-        mutation = new PolynomialMutation.Builder().build();
-//        mutation = null;
+        mutation = new PolynomialMutation.Builder().setProbability(mutationProbability).build();
         builder.setMutation(mutation);
 
         builder.setSelection(new BinaryTournament.Builder().setComparator(new FitnessComparator()).build());
 
         algorithm = builder.build();
-
-        algorithms += "_" + crossover.getClass().getSimpleName() +"_"+ mutation.getClass().getSimpleName();
+        
+//        algorithms += "_" + crossover.getClass().getSimpleName() + "_" + mutation.getClass().getSimpleName();
         
         File rootDir = createDir(path);
         File algorithmDir = createDir(rootDir.getPath() + File.separator + algorithms + File.separator);

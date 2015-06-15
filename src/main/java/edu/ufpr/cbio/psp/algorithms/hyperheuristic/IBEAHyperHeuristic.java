@@ -278,7 +278,6 @@ public class IBEAHyperHeuristic implements Algorithm {
 
 				//Escolha da LowLevelHeuristic
 				LowLevelHeuristic lowLevelHeuristic = lowLevelHeuristics.get(0);
-				System.out.println(lowLevelHeuristic.getName());
 				
 				//Executa a Low Level Heuristic (Cruzamento e Mutação)
 				Solution[] offSpring = (Solution[]) lowLevelHeuristic.execute(parents);
@@ -324,26 +323,16 @@ public class IBEAHyperHeuristic implements Algorithm {
 
 		public Builder(Problem problem) {
 			this.problem = problem ;
-			populationSize = 100 ;
-			archiveSize = 100 ;
-			maxEvaluations = 25000 ;
+			this.populationSize = 100 ;
+			this.archiveSize = 100 ;
+			this.maxEvaluations = 25000 ;
 
-			lowLevelHeuristics = new ArrayList<LowLevelHeuristic>();
-			lowLevelHeuristics.add(
-				new LowLevelHeuristic(
-					"SBX_PolyMut",
-					 new SBXCrossover.Builder()
-						.setProbability(0.9)
-						.setDistributionIndex(20.0)
-						.build(),
-					 new PolynomialMutation.Builder()
-						.setProbability(1.0 / problem.getNumberOfVariables())
-						.setDistributionIndex(20.0)
-						.build()
-				)
-			);
+			this.lowLevelHeuristics = new ArrayList<LowLevelHeuristic>();
+			this.lowLevelHeuristics.add(
+					new LowLevelHeuristic.Builder()
+					.build());
 
-			selection = new BinaryTournament.Builder()
+			this.selection = new BinaryTournament.Builder()
 				.setComparator(new FitnessComparator())
 				.build() ;
 

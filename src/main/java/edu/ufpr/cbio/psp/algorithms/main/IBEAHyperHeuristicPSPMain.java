@@ -57,16 +57,19 @@ public class IBEAHyperHeuristicPSPMain {
         List<Crossover> listCrossover = new ArrayList<Crossover>();
         listCrossover.add(new SinglePointCrossover.Builder().setProbability(crossoverProbability).build());
         listCrossover.add(new IntegerTwoPointsCrossover.Builder().crossoverProbability(crossoverProbability).build());
-        listCrossover.add(new UniformCrossover.Builder().crossoverProbability(crossoverProbability).build());
+        //listCrossover.add(new UniformCrossover.Builder().crossoverProbability(crossoverProbability).build());
 
         double mutationProbability = 0.01;//1.0 / problem.getNumberOfVariables();
         
         List<Mutation> listMutation = new ArrayList<Mutation>();
         listMutation.add(new BitFlipMutation.Builder().setProbability(mutationProbability).build());
-        //listMutation.add(new UniformMutation.Builder(mutationDistributionIndex, mutationProbability).build());//Nao roda pra IntSolution
         listMutation.add(null);
 
-        List<LowLevelHeuristic> lowLevelHeuristics = generateLowLevelHeuristics(listCrossover, listMutation);
+        double alpha = 1.0;
+        double beta = 0.00015;
+        
+        List<LowLevelHeuristic> lowLevelHeuristics = 
+        		LowLevelHeuristic.Builder.generateLowLevelHeuristics(listCrossover, listMutation, alpha, beta);
         
         builder.setLowLevelHeuristics(lowLevelHeuristics);
 
@@ -74,6 +77,8 @@ public class IBEAHyperHeuristicPSPMain {
 
         algorithm = builder.build();
 
+        algorithms += "_" + alpha + "_" + beta;
+        
         File rootDir = createDir(path);
         File algorithmDir = createDir(rootDir.getPath() + File.separator + algorithms + File.separator);
         File objectivesDir = createDir(algorithmDir.getPath() + File.separator);
@@ -127,26 +132,4 @@ public class IBEAHyperHeuristicPSPMain {
         return file;
     }
 
-    public static List<LowLevelHeuristic> generateLowLevelHeuristics(List<Crossover> listCrossover, List<Mutation> listMutation) {
-    	
-    	List<LowLevelHeuristic> lowLevelHeuristics = new ArrayList<LowLevelHeuristic>();
-    	
-    	for (Crossover crossover : listCrossover) {
-			for (Mutation mutation : listMutation) {
-				LowLevelHeuristic lowLevelHeuristic = new LowLevelHeuristic();
-
-				if(mutation != null)
-					lowLevelHeuristic.setName(crossover.getClass().getSimpleName()+"_"+mutation.getClass().getSimpleName());
-				else
-					lowLevelHeuristic.setName(crossover.getClass().getSimpleName()+"_NullMutation");
-				lowLevelHeuristic.setCrossover(crossover);
-				lowLevelHeuristic.setMutation(mutation);
-				lowLevelHeuristics.add(lowLevelHeuristic);
-				
-				System.out.println(lowLevelHeuristic.getName());
-			}
-		}
-    	
-    	return lowLevelHeuristics;
-    }
 }
