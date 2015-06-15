@@ -10,22 +10,27 @@ import org.uma.jmetal.operator.crossover.Crossover;
 import org.uma.jmetal.operator.crossover.SinglePointCrossover;
 import org.uma.jmetal.operator.mutation.BitFlipMutation;
 import org.uma.jmetal.operator.mutation.Mutation;
+import org.uma.jmetal.operator.mutation.PolynomialBitFlipMutation;
+import org.uma.jmetal.operator.mutation.PolynomialMutation;
+import org.uma.jmetal.operator.mutation.UniformMutation;
 import org.uma.jmetal.operator.selection.BinaryTournament;
 import org.uma.jmetal.util.comparator.FitnessComparator;
 import org.uma.jmetal.util.fileoutput.SolutionSetOutput;
 
 import edu.ufpr.cbio.psp.problem.PSPProblem;
+import edu.ufpr.cbio.psp.problem.custom.operators.IntegerTwoPointsCrossover;
+import edu.ufpr.cbio.psp.problem.custom.operators.UniformCrossover;
 
 public class IBEAPSPProblemRelativeMain {
 
     public static void main(String[] args) throws Exception {
 
-        File file = new File("psp_experiments_ibea");
+        File file = new File("results");
         if (!file.exists()) {
             file.mkdir();
         }
 
-        String path = "psp_experiments_ibea/tmp_experiments";
+        String path = file.getPath()+File.separator+"PSP";
         String algorithms = "IBEA";
         int executions = 30;
 
@@ -51,19 +56,26 @@ public class IBEAPSPProblemRelativeMain {
         builder.setArchiveSize(archiveSize);
 
         double crossoverProbability = 0.9;
-        double crossoverDistributionIndex = 20.0;
-        Crossover crossover = new SinglePointCrossover.Builder().setProbability(crossoverProbability).build();
+//        double crossoverDistributionIndex = 20.0;
+        Crossover crossover;
+//        crossover = new SinglePointCrossover.Builder().setProbability(crossoverProbability).build();//1
+//        crossover = new IntegerTwoPointsCrossover.Builder().crossoverProbability(crossoverProbability).build();//2
+        crossover = new UniformCrossover.Builder().crossoverProbability(crossoverProbability).build();//3
         builder.setCrossover(crossover);
 
-        double mutationProbability = 1.0 / problem.getNumberOfVariables();
-        double mutationDistributionIndex = 20.0;
-        Mutation mutation = new BitFlipMutation.Builder().setProbability(mutationProbability).build();
+        double mutationProbability = 0.01;
+//        double mutationDistributionIndex = 20.0;
+        Mutation mutation;
+//        mutation = new BitFlipMutation.Builder().setProbability(mutationProbability).build();
+        mutation = new PolynomialMutation.Builder().setProbability(mutationProbability).build();
         builder.setMutation(mutation);
 
         builder.setSelection(new BinaryTournament.Builder().setComparator(new FitnessComparator()).build());
 
         algorithm = builder.build();
-
+        
+//        algorithms += "_" + crossover.getClass().getSimpleName() + "_" + mutation.getClass().getSimpleName();
+        
         File rootDir = createDir(path);
         File algorithmDir = createDir(rootDir.getPath() + File.separator + algorithms + File.separator);
         File objectivesDir = createDir(algorithmDir.getPath() + File.separator);

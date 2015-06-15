@@ -1,50 +1,47 @@
-package edu.ufpr.cbio.psp.algorithms;
+package edu.ufpr.cbio.psp.algorithms.main;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.uma.jmetal.core.Algorithm;
-import org.uma.jmetal.core.Operator;
 import org.uma.jmetal.core.SolutionSet;
-import org.uma.jmetal.metaheuristic.multiobjective.nsgaII.NSGAIITemplate;
+import org.uma.jmetal.operator.crossover.Crossover;
 import org.uma.jmetal.operator.crossover.SinglePointCrossover;
-import org.uma.jmetal.operator.crossover.TwoPointsCrossover;
 import org.uma.jmetal.operator.mutation.BitFlipMutation;
-import org.uma.jmetal.operator.selection.BinaryTournament2;
-import org.uma.jmetal.util.evaluator.SequentialSolutionSetEvaluator;
-import org.uma.jmetal.util.evaluator.SolutionSetEvaluator;
+import org.uma.jmetal.operator.mutation.Mutation;
+import org.uma.jmetal.operator.selection.BinaryTournament;
+import org.uma.jmetal.util.comparator.FitnessComparator;
 import org.uma.jmetal.util.fileoutput.SolutionSetOutput;
 
+import edu.ufpr.cbio.psp.algorithms.hyperheuristic.IBEAHyperHeuristic;
+import edu.ufpr.cbio.psp.algorithms.hyperheuristic.LowLevelHeuristic;
 import edu.ufpr.cbio.psp.problem.PSPProblem;
+import edu.ufpr.cbio.psp.problem.custom.operators.IntegerTwoPointsCrossover;
+import edu.ufpr.cbio.psp.problem.custom.operators.UniformCrossover;
 
-public class NSGAIIPSPProblemRelativeMain {
+public class IBEAHyperHeuristicPSPMain {
 
-    public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 
-        File file = new File("psp_experiments");
+        File file = new File("results");
         if (!file.exists()) {
             file.mkdir();
         }
 
-        String path = "psp_experiments/tmp_experiments";
-        String algorithms = "NSGAII";
+        String path = file.getPath()+File.separator+"PSP";
+        String algorithms = "IBEAHH";
         int executions = 30;
 
         PSPProblem problem; // The problem to solve
         Algorithm algorithm; // The algorithm to use
-        Operator crossover; // Crossover operator
-        Operator mutation; // Mutation operator
-        Operator selection; // Selection operator
-
-        HashMap<String, Double> parameters; // Operator parameters
 
         String proteinChain =
             "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
         int numberOfObjectives = 2;
         problem = new PSPProblem(proteinChain, numberOfObjectives);
 
-        SolutionSetEvaluator evaluator = new SequentialSolutionSetEvaluator();
-        NSGAIITemplate.Builder builder = new NSGAIITemplate.Builder(problem, evaluator);
+        IBEAHyperHeuristic.Builder builder = new IBEAHyperHeuristic.Builder(problem);
 
         int populationSize = 100;
         builder.setPopulationSize(populationSize);
@@ -52,19 +49,36 @@ public class NSGAIIPSPProblemRelativeMain {
         int maxEvaluations = 25000;
         builder.setMaxEvaluations(maxEvaluations);
 
+        int archiveSize = 100;
+        builder.setArchiveSize(archiveSize);
+
         double crossoverProbability = 0.9;
-        crossover = new SinglePointCrossover.Builder().setProbability(crossoverProbability).build();
-        builder.setCrossover(crossover);
+        
+        List<Crossover> listCrossover = new ArrayList<Crossover>();
+        listCrossover.add(new SinglePointCrossover.Builder().setProbability(crossoverProbability).build());
+        listCrossover.add(new IntegerTwoPointsCrossover.Builder().crossoverProbability(crossoverProbability).build());
+        //listCrossover.add(new UniformCrossover.Builder().crossoverProbability(crossoverProbability).build());
 
-        double mutationProbability = 1.0 / problem.getNumberOfVariables();
-        mutation = new BitFlipMutation.Builder().setProbability(mutationProbability).build();
-        builder.setMutation(mutation);
+        double mutationProbability = 0.01;//1.0 / problem.getNumberOfVariables();
+        
+        List<Mutation> listMutation = new ArrayList<Mutation>();
+        listMutation.add(new BitFlipMutation.Builder().setProbability(mutationProbability).build());
+        listMutation.add(null);
 
-        selection = new BinaryTournament2.Builder().build();
-        builder.setSelection(selection);
+        double alpha = 1.0;
+        double beta = 0.00015;
+        
+        List<LowLevelHeuristic> lowLevelHeuristics = 
+        		LowLevelHeuristic.Builder.generateLowLevelHeuristics(listCrossover, listMutation, alpha, beta);
+        
+        builder.setLowLevelHeuristics(lowLevelHeuristics);
 
-        algorithm = builder.build("NSGAII");
+        builder.setSelection(new BinaryTournament.Builder().setComparator(new FitnessComparator()).build());
 
+        algorithm = builder.build();
+
+        algorithms += "_" + alpha + "_" + beta;
+        
         File rootDir = createDir(path);
         File algorithmDir = createDir(rootDir.getPath() + File.separator + algorithms + File.separator);
         File objectivesDir = createDir(algorithmDir.getPath() + File.separator);
@@ -79,8 +93,6 @@ public class NSGAIIPSPProblemRelativeMain {
 
             // Execute the Algorithm
             System.out.println("Execution: " + (i + 1));
-            System.out.println(mutation.toString());
-            System.out.println(crossover.toString());
             long initTime = System.currentTimeMillis();
             SolutionSet population = algorithm.execute();
             long estimatedTime = System.currentTimeMillis() - initTime;
@@ -92,8 +104,6 @@ public class NSGAIIPSPProblemRelativeMain {
 
             problem.removeDominateds(population);
             problem.removeDuplicates(population);
-
-            population.printObjectives();
 
             SolutionSetOutput.printVariablesToFile(population, executionDirectory + File.separator + "VAR.txt");
             SolutionSetOutput.printObjectivesToFile(population, executionDirectory + File.separator + "FUN.txt");
@@ -111,7 +121,6 @@ public class NSGAIIPSPProblemRelativeMain {
 
         SolutionSetOutput.printVariablesToFile(allRuns, outputDir + "VAR.txt");
         SolutionSetOutput.printObjectivesToFile(allRuns, outputDir + "FUN.txt");
-
     }
 
     private static File createDir(String dir) {
@@ -122,4 +131,5 @@ public class NSGAIIPSPProblemRelativeMain {
         }
         return file;
     }
+
 }
