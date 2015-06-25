@@ -3,132 +3,134 @@ package edu.ufpr.cbio.psp.problem.custom.operators;
 import org.uma.jmetal.core.Solution;
 import org.uma.jmetal.core.Variable;
 import org.uma.jmetal.encoding.solutiontype.IntSolutionType;
-import org.uma.jmetal.encoding.solutiontype.PermutationSolutionType;
-import org.uma.jmetal.encoding.solutiontype.wrapper.XInt;
-import org.uma.jmetal.encoding.variable.Int;
-import org.uma.jmetal.encoding.variable.Permutation;
 import org.uma.jmetal.operator.crossover.Crossover;
-import org.uma.jmetal.operator.crossover.TwoPointsCrossover.Builder;
 import org.uma.jmetal.util.JMetalException;
 import org.uma.jmetal.util.JMetalLogger;
 import org.uma.jmetal.util.random.PseudoRandom;
 
-public class IntegerTwoPointsCrossover extends Crossover{
+public class IntegerTwoPointsCrossover extends Crossover {
 
-	private double crossoverProbability ;
+    private double crossoverProbability;
 
-	/** Constructor */
-	private IntegerTwoPointsCrossover(Builder builder) {
-		addValidSolutionType(IntSolutionType.class);
+    /** Constructor */
+    private IntegerTwoPointsCrossover(Builder builder) {
 
-		crossoverProbability = builder.crossoverProbability ;
-	}
+        addValidSolutionType(IntSolutionType.class);
 
-	public Solution[] doCrossover(double probability,
-			Solution parent1,
-			Solution parent2) throws JMetalException{
+        crossoverProbability = builder.crossoverProbability;
+    }
 
-		Solution[] offspring = new Solution[2];
+    public Solution[] doCrossover(double probability, Solution parent1, Solution parent2) throws JMetalException {
 
-		offspring[0] = new Solution(parent1);
-		offspring[1] = new Solution(parent2);
+        Solution[] offspring = new Solution[2];
 
-		if (PseudoRandom.randDouble() < probability) {
-			if (parent1.getType().getClass() == IntSolutionType.class) {
-				int crosspoint1;
-				int crosspoint2;
-				int permutationLength;
-				Variable parent1Vector[];
-				Variable parent2Vector[];
-				Variable offspring1Vector[];
-				Variable offspring2Vector[];
+        offspring[0] = new Solution(parent1);
+        offspring[1] = new Solution(parent2);
 
-				permutationLength = parent1.getDecisionVariables().length;//tamanho do individuo
-				parent1Vector = parent1.getDecisionVariables();//vetor do pai 1
-				parent2Vector = parent2.getDecisionVariables();//vetor do pai 2
-				offspring1Vector = offspring[0].getDecisionVariables();//vetor filho 1
-				offspring2Vector = offspring[1].getDecisionVariables();//vetor filho 2
+        if (PseudoRandom.randDouble() < probability) {
+            if (parent1.getType().getClass() == IntSolutionType.class) {
+                int crosspoint1;
+                int crosspoint2;
+                int permutationLength;
+                Variable parent1Vector[];
+                Variable parent2Vector[];
+                Variable offspring1Vector[];
+                Variable offspring2Vector[];
 
-				// STEP 1: Get two cutting points
-				crosspoint1 = PseudoRandom.randInt(0, permutationLength - 1);
-				crosspoint2 = PseudoRandom.randInt(0, permutationLength - 1);
+                permutationLength = parent1.getDecisionVariables().length;// tamanho
+                                                                          // do
+                                                                          // individuo
+                parent1Vector = parent1.getDecisionVariables();// vetor do pai 1
+                parent2Vector = parent2.getDecisionVariables();// vetor do pai 2
+                offspring1Vector = offspring[0].getDecisionVariables();// vetor
+                                                                       // filho
+                                                                       // 1
+                offspring2Vector = offspring[1].getDecisionVariables();// vetor
+                                                                       // filho
+                                                                       // 2
 
-				while (crosspoint2 == crosspoint1) {
-					crosspoint2 = PseudoRandom.randInt(0, permutationLength - 1);
-				}
+                // STEP 1: Get two cutting points
+                crosspoint1 = PseudoRandom.randInt(0, permutationLength - 1);
+                crosspoint2 = PseudoRandom.randInt(0, permutationLength - 1);
 
-				//Garante que ponto1 sempre vai ser <= que ponto2
-				if (crosspoint1 > crosspoint2) {
-					int swap;
-					swap = crosspoint1;
-					crosspoint1 = crosspoint2;
-					crosspoint2 = swap;
-				}
-				
-				//Troca apenas o meio de cada filho, pois o resto ja foi copiado do pai
-				for (int i = crosspoint1; i <= crosspoint2; i++) {
-					offspring1Vector[i] = parent2Vector[i];
-					offspring2Vector[i] = parent1Vector[i];
-				}
-			} else {
-				JMetalLogger.logger.severe("TwoPointsCrossover.doCrossover: invalid " +
-						"type" +
-						parent1.getType().getClass());
-				Class<String> cls = java.lang.String.class;
-				String name = cls.getName();
-				throw new JMetalException("Exception in " + name + ".doCrossover()");
-			}
-		}
+                while (crosspoint2 == crosspoint1) {
+                    crosspoint2 = PseudoRandom.randInt(0, permutationLength - 1);
+                }
 
-		return offspring;
-	}
+                // Garante que ponto1 sempre vai ser <= que ponto2
+                if (crosspoint1 > crosspoint2) {
+                    int swap;
+                    swap = crosspoint1;
+                    crosspoint1 = crosspoint2;
+                    crosspoint2 = swap;
+                }
 
-	@Override
-	public Object execute(Object object) throws JMetalException {
-		if (null == object) {
-			throw new JMetalException("Null parameter") ;
-		} else if (!(object instanceof Solution[])) {
-			throw new JMetalException("Invalid parameter class") ;
-		}
+                // Troca apenas o meio de cada filho, pois o resto ja foi
+                // copiado do pai
+                for (int i = crosspoint1; i <= crosspoint2; i++) {
+                    offspring1Vector[i] = parent2Vector[i].copy();
+                    offspring2Vector[i] = parent1Vector[i].copy();
+                }
+            } else {
+                JMetalLogger.logger.severe("TwoPointsCrossover.doCrossover: invalid " + "type"
+                    + parent1.getType().getClass());
+                Class<String> cls = java.lang.String.class;
+                String name = cls.getName();
+                throw new JMetalException("Exception in " + name + ".doCrossover()");
+            }
+        }
 
-		Solution[] parents = (Solution[]) object;
+        return offspring;
+    }
 
-		if (!solutionTypeIsValid(parents)) {
-			throw new JMetalException("PolynomialMutation.execute: the solutiontype " +
-					"type " + parents[0].getType() + " is not allowed with this operator");
-		}
+    @Override
+    public Object execute(Object object) throws JMetalException {
 
-		if (parents.length < 2) {
-			JMetalLogger.logger.severe("TwoPointsCrossover.execute: operator needs two " +
-					"parents");
-			Class<String> cls = java.lang.String.class;
-			String name = cls.getName();
-			throw new JMetalException("Exception in " + name + ".execute()");
-		}
+        if (null == object) {
+            throw new JMetalException("Null parameter");
+        } else if (!(object instanceof Solution[])) {
+            throw new JMetalException("Invalid parameter class");
+        }
 
-		Solution[] offspring = doCrossover(crossoverProbability,
-				parents[0],
-				parents[1]);
+        Solution[] parents = (Solution[]) object;
 
-		return offspring;
-	}
+        if (!solutionTypeIsValid(parents)) {
+            throw new JMetalException("PolynomialMutation.execute: the solutiontype " + "type " + parents[0].getType()
+                + " is not allowed with this operator");
+        }
 
-	/** Builder class */
-	public static class Builder {
-		private double crossoverProbability;
+        if (parents.length < 2) {
+            JMetalLogger.logger.severe("TwoPointsCrossover.execute: operator needs two " + "parents");
+            Class<String> cls = java.lang.String.class;
+            String name = cls.getName();
+            throw new JMetalException("Exception in " + name + ".execute()");
+        }
 
-		public Builder() {
-			crossoverProbability = 0 ;
-		}
+        Solution[] offspring = doCrossover(crossoverProbability, parents[0], parents[1]);
 
-		public Builder crossoverProbability(double crossoverProbability) {
-			this.crossoverProbability = crossoverProbability ;
+        return offspring;
+    }
 
-			return this ;
-		}
+    /** Builder class */
+    public static class Builder {
 
-		public IntegerTwoPointsCrossover build() {
-			return new IntegerTwoPointsCrossover(this) ;
-		}
-	}
+        private double crossoverProbability;
+
+        public Builder() {
+
+            crossoverProbability = 0;
+        }
+
+        public Builder setCrossoverProbability(double crossoverProbability) {
+
+            this.crossoverProbability = crossoverProbability;
+
+            return this;
+        }
+
+        public IntegerTwoPointsCrossover build() {
+
+            return new IntegerTwoPointsCrossover(this);
+        }
+    }
 }

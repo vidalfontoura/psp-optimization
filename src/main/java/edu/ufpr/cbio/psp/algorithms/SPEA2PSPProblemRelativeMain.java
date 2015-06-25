@@ -7,30 +7,27 @@ import org.uma.jmetal.core.Algorithm;
 import org.uma.jmetal.core.SolutionSet;
 import org.uma.jmetal.metaheuristic.multiobjective.spea2.SPEA2;
 import org.uma.jmetal.operator.crossover.Crossover;
-import org.uma.jmetal.operator.crossover.SinglePointCrossover;
 import org.uma.jmetal.operator.mutation.BitFlipMutation;
 import org.uma.jmetal.operator.mutation.Mutation;
-import org.uma.jmetal.operator.mutation.PolynomialMutation;
 import org.uma.jmetal.operator.selection.BinaryTournament2;
 import org.uma.jmetal.operator.selection.Selection;
 import org.uma.jmetal.util.fileoutput.SolutionSetOutput;
 
 import edu.ufpr.cbio.psp.problem.PSPProblem;
-import edu.ufpr.cbio.psp.problem.custom.operators.IntegerTwoPointsCrossover;
 import edu.ufpr.cbio.psp.problem.custom.operators.UniformCrossover;
 
 public class SPEA2PSPProblemRelativeMain {
 
     public static void main(String[] args) throws Exception {
 
-        File file = new File("results");
+        File file = new File("result");
         if (!file.exists()) {
             file.mkdir();
         }
 
-        String path = file.getPath()+File.separator+"PSP";
-        String algorithms = "SPEA2";
-        int executions = 30;
+        String path = "results/psp";
+        String algorithms = "SPEA2-test-infesaible";
+        int executions = 1;
 
         PSPProblem problem; // The problem to solve
         Algorithm algorithm; // The algorithm to use
@@ -44,28 +41,30 @@ public class SPEA2PSPProblemRelativeMain {
 
         SPEA2.Builder builder = new SPEA2.Builder(problem);
 
-        int populationSize = 100;
+        int populationSize = 300;
         builder.setPopulationSize(populationSize);
 
-        int maxEvaluations = 25000;
+        int maxEvaluations = 60000;
         builder.setMaxEvaluations(maxEvaluations);
 
-        int archiveSize = 100;
+        int archiveSize = 250;
         builder.setArchiveSize(archiveSize);
 
         double crossoverProbability = 0.9;
-//        double crossoverDistributionIndex = 20.0;
-        Crossover crossover;
-//        crossover = new SinglePointCrossover.Builder().setProbability(crossoverProbability).build();//1
-//        crossover = new IntegerTwoPointsCrossover.Builder().crossoverProbability(crossoverProbability).build();//1
-        crossover = new UniformCrossover.Builder().crossoverProbability(crossoverProbability).build();//1
+        double crossoverDistributionIndex = 20.0;
+
+        Crossover crossover = // new
+                              // SinglePointCrossover.Builder().setProbability(crossoverProbability).build();
+            // new
+            // PSPIntegerUniformCrossover.Builder().crossoverProbability(crossoverProbability).build();
+            // new
+            // IntegerTwoPointsCrossover.Builder().setCrossoverProbability(crossoverProbability).build();
+            new UniformCrossover.Builder().setCrossoverProbability(crossoverProbability).build();
         builder.setCrossover(crossover);
 
         double mutationProbability = 0.01;
-//        double mutationDistributionIndex = 20.0;
-        Mutation mutation;
-//        mutation = new BitFlipMutation.Builder().setProbability(mutationProbability).build();
-        mutation = new PolynomialMutation.Builder().setProbability(mutationProbability).build();
+        double mutationDistributionIndex = 20.0;
+        Mutation mutation = new BitFlipMutation.Builder().setProbability(mutationProbability).build();
         builder.setMutation(mutation);
 
         Selection selection = new BinaryTournament2.Builder().build();
@@ -73,10 +72,10 @@ public class SPEA2PSPProblemRelativeMain {
 
         algorithm = builder.build();
 
-//        algorithms += "_" + crossover.getClass().getSimpleName() + "_" + mutation.getClass().getSimpleName();
-        
         File rootDir = createDir(path);
-        File algorithmDir = createDir(rootDir.getPath() + File.separator + algorithms + File.separator);
+        File algorithmDir =
+            createDir(rootDir.getPath() + File.separator + algorithms + "_" + crossover.getClass().getSimpleName()
+                + "_" + mutation.getClass().getSimpleName() + File.separator);
         File objectivesDir = createDir(algorithmDir.getPath() + File.separator);
 
         String outputDir = objectivesDir.getPath() + File.separator;
@@ -100,13 +99,13 @@ public class SPEA2PSPProblemRelativeMain {
 
             problem.removeDominateds(population);
             problem.removeDuplicates(population);
-            
+
             SolutionSetOutput.printVariablesToFile(population, executionDirectory + File.separator + "VAR.txt");
             SolutionSetOutput.printObjectivesToFile(population, executionDirectory + File.separator + "FUN.txt");
 
             allRuns = allRuns.union(population);
         }
-        
+
         System.out.println();
         System.out.println("End of execution for problem " + problem.getClass().getName() + ".");
         System.out.println("Total time (seconds): " + allExecutionTime / 1000);
@@ -117,7 +116,7 @@ public class SPEA2PSPProblemRelativeMain {
 
         SolutionSetOutput.printVariablesToFile(allRuns, outputDir + "VAR.txt");
         SolutionSetOutput.printObjectivesToFile(allRuns, outputDir + "FUN.txt");
-        
+
     }
 
     private static File createDir(String dir) {
