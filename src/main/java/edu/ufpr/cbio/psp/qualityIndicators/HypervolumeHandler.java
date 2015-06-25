@@ -41,10 +41,12 @@ public class HypervolumeHandler {
 
         if (population.size() != 0) {
             double[][] referencePoint = getReferencePoint(numberOfObjectives);
-            double[] maximumValues = new double[]{0, 100};
-//                metricUtil.getMaximumValues(population.writeObjectivesToMatrix(), numberOfObjectives);
-            double[] minimumValues = new double[]{-50, 10};
-//                metricUtil.getMinimumValues(population.writeObjectivesToMatrix(), numberOfObjectives);
+            double[] maximumValues = new double[] { -5, 30 };
+            // metricUtil.getMaximumValues(population.writeObjectivesToMatrix(),
+            // numberOfObjectives);
+            double[] minimumValues = new double[] { -50, 10 };
+            // metricUtil.getMinimumValues(population.writeObjectivesToMatrix(),
+            // numberOfObjectives);
             double[][] objectives =
                 metricUtil.getNormalizedFront(front.writeObjectivesToMatrix(), maximumValues, minimumValues);
             return hypervolume.hypervolume(objectives, referencePoint);

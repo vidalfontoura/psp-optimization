@@ -24,42 +24,20 @@ public class ExperimentsMain {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-    	//Pasta dos resultados
-        String experimentsDir = "results";
+        // Pasta dos resultados
+        // String experimentsDir = "results";
+        String experimentsDir = "results-compare-spea2-ibea-bests";
+        // Pasta do problema
+        // String[] problems = new String[] { "psp" };
+        String[] problems = new String[] { "P6HPH2P5H3PH5PH2P4H2P2H2PH5PH10PH2PH7P11H7P2HPH3P6HPH2" };
 
-        //Pasta do problema
-        String[] problems = new String[] { "PSP"};
-        
-        //Pasta dos algoritmos
-        String[] algorithms = new String[] {
-        		"IBEA_SinglePointCrossover_BitFlipMutation",
-        		"IBEA_IntegerTwoPointsCrossover_BitFlipMutation",
-        		"IBEA_UniformCrossover_BitFlipMutation",
-        		
-        		"IBEA_SinglePointCrossover_PolynomialMutation",
-        		"IBEA_IntegerTwoPointsCrossover_PolynomialMutation",
-        		"IBEA_UniformCrossover_PolynomialMutation",
-        		
-        		"SPEA2_SinglePointCrossover_BitFlipMutation",
-        		"SPEA2_IntegerTwoPointsCrossover_BitFlipMutation",
-        		"SPEA2_UniformCrossover_BitFlipMutation",
-        		
-        		"SPEA2_SinglePointCrossover_PolynomialMutation",
-        		"SPEA2_IntegerTwoPointsCrossover_PolynomialMutation",
-        		"SPEA2_UniformCrossover_PolynomialMutation"
-        		};
-//        String[] algorithms = new String[] {
-//        		"IBEA", "IBEAHH", "IBEAHH_1.0_1.0E-5", "IBEAHH_1.0_2.5E-5",
-//        		"SPEA2", "SPEA2HH", "SPEA2HH_1.0_1.0E-5", "SPEA2HH_1.0_2.5E-5"
-//        		};
-//        String[] algorithms = new String[] {
-//        		"IBEAHH", 
-//        		"IBEAHH_1.0_2.5E-5", 
-//        		"IBEAHH_1.0_1.0E-5"
-//        		//"SPEA2HH", 
-//        		//"SPEA2HH_1.0_2.5E-5"
-//        };
-        
+        // Pasta dos algoritmos
+        // String[] algorithms =
+        // new String[] {
+        // "SPEA2-new-config_SinglePointCrossover_BitFlipMutation",
+        // "SPEA2HH-new-config-tests" };
+
+        String[] algorithms = new String[] { "SPEA2", "IBEA" };
         boolean debugMode = false;
 
         MetricsUtil metricsUtil = new MetricsUtil();

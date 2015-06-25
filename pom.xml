@@ -68,6 +68,11 @@
             <version>5.0-Beta-16-SNAPSHOT</version>
             
 		</dependency>
+		<dependency>
+		    <groupId>org.myjavaplot</groupId>
+		    <artifactId>JavaPlot</artifactId>
+		    <version>1.0.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -80,6 +85,60 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+             <!-- appassember plugin -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>appassembler-maven-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>make-assemble</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>assemble</goal>
+                        </goals>
+                        <configuration>
+                            <programs>
+                                <program>
+                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.SPEA2TuningMultiobjectiveMain</mainClass>
+                                    <name>spea2-daemon</name>
+                                </program>
+                                 <program>
+                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.SPEA2HHTuningMultiobjectiveMain</mainClass>
+                                    <name>spea2hh-daemon</name>
+                                </program>
+                                <program>
+                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.IBEATuningMultiobjectiveMain</mainClass>
+                                    <name>ibea-daemon</name>
+                                </program>
+                                <program>
+                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.IBEAHHTuningMultiobjectiveMain</mainClass>
+                                    <name>ibeahh-daemon</name>
+                                </program>
+                            </programs>
+                            <repositoryLayout>flat</repositoryLayout>
+                            <!-- <useWildcardClassPath>true</useWildcardClassPath> -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptor>src/main/assembly/bin.xml</descriptor>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             </plugins>
 	</build>

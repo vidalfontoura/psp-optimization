@@ -15,22 +15,21 @@ import org.uma.jmetal.util.comparator.FitnessComparator;
 import org.uma.jmetal.util.fileoutput.SolutionSetOutput;
 
 import edu.ufpr.cbio.psp.algorithms.hyperheuristic.IBEAHyperHeuristic;
-import edu.ufpr.cbio.psp.algorithms.hyperheuristic.LowLevelHeuristic;
+import edu.ufpr.cbio.psp.algorithms.hyperheuristic.lowlevelheuristic.LowLevelHeuristic;
 import edu.ufpr.cbio.psp.problem.PSPProblem;
 import edu.ufpr.cbio.psp.problem.custom.operators.IntegerTwoPointsCrossover;
-import edu.ufpr.cbio.psp.problem.custom.operators.UniformCrossover;
 
 public class IBEAHyperHeuristicPSPMain {
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         File file = new File("results");
         if (!file.exists()) {
             file.mkdir();
         }
 
-        String path = file.getPath()+File.separator+"PSP";
-        String algorithms = "IBEAHH";
+        String path = file.getPath() + File.separator + "PSP";
+        String algorithms = "IBEAHH-choice-ricardo";
         int executions = 30;
 
         PSPProblem problem; // The problem to solve
@@ -53,24 +52,27 @@ public class IBEAHyperHeuristicPSPMain {
         builder.setArchiveSize(archiveSize);
 
         double crossoverProbability = 0.9;
-        
+
         List<Crossover> listCrossover = new ArrayList<Crossover>();
         listCrossover.add(new SinglePointCrossover.Builder().setProbability(crossoverProbability).build());
-        listCrossover.add(new IntegerTwoPointsCrossover.Builder().crossoverProbability(crossoverProbability).build());
-        //listCrossover.add(new UniformCrossover.Builder().crossoverProbability(crossoverProbability).build());
+        listCrossover
+            .add(new IntegerTwoPointsCrossover.Builder().setCrossoverProbability(crossoverProbability).build());
+        // listCrossover.add(new
+        // UniformCrossover.Builder().crossoverProbability(crossoverProbability).build());
 
-        double mutationProbability = 0.01;//1.0 / problem.getNumberOfVariables();
-        
+        double mutationProbability = 0.01;// 1.0 /
+                                          // problem.getNumberOfVariables();
+
         List<Mutation> listMutation = new ArrayList<Mutation>();
         listMutation.add(new BitFlipMutation.Builder().setProbability(mutationProbability).build());
         listMutation.add(null);
 
         double alpha = 1.0;
         double beta = 0.00015;
-        
-        List<LowLevelHeuristic> lowLevelHeuristics = 
-        		LowLevelHeuristic.Builder.generateLowLevelHeuristics(listCrossover, listMutation, alpha, beta);
-        
+
+        List<LowLevelHeuristic> lowLevelHeuristics =
+            LowLevelHeuristic.Builder.generateLowLevelHeuristics(listCrossover, listMutation, alpha, beta);
+
         builder.setLowLevelHeuristics(lowLevelHeuristics);
 
         builder.setSelection(new BinaryTournament.Builder().setComparator(new FitnessComparator()).build());
@@ -78,7 +80,7 @@ public class IBEAHyperHeuristicPSPMain {
         algorithm = builder.build();
 
         algorithms += "_" + alpha + "_" + beta;
-        
+
         File rootDir = createDir(path);
         File algorithmDir = createDir(rootDir.getPath() + File.separator + algorithms + File.separator);
         File objectivesDir = createDir(algorithmDir.getPath() + File.separator);
