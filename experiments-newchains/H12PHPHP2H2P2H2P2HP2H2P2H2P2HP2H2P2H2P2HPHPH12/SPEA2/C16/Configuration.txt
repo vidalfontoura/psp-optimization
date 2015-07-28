@@ -1,0 +1,10 @@
+Algorithm: SPEA2
+Crossover: IntegerTwoPointsCrossover
+Cx Rate: 0.9
+Mutation: BitFlipMutation
+Mut Rate: 0.01
+Population: 250
+Max Evaluations: 50000
+Aux Pop: 200
+ProteinChain: HHHHHHHHHHHHPHPHPPHHPPHHPPHPPHHPPHHPPHPPHHPPHHPPHPHPHHHHHHHHHHHH
+Total time taken to execute 30 times : 12272(seconds)

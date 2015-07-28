@@ -35,12 +35,14 @@ public class TunningExperimentsMain {
         // String experimentsDir =
         // "/Users/vfontoura/Documents/Mestrado/top_ia/results-speahh/results-speahh-hhmutation";
 
-        String experimentsDir = "/Users/vfontoura/Documents/Mestrado/top_ia/compare-bit-hh";
+        // String experimentsDir =
+        // "/Users/vfontoura/workspace/work_master/PSP-Optimization/experiments-newchains";
+        String experimentsDir = "experiments-newchains";
         // Pasta do problema
-        String[] problems = new String[] { "P6HPH2P5H3PH5PH2P4H2P2H2PH5PH10PH2PH7P11H7P2HPH3P6HPH2" };
+        String[] problems = new String[] { "H12PHPHP2H2P2H2P2HP2H2P2H2P2HP2H2P2H2P2HPHPH12 copy" };
 
         // Pasta dos algoritmos
-        String[] algorithms = new String[] { "SPEA2" };
+        String[] algorithms = new String[] { "IBEA", "NSGAII" };
 
         boolean debugMode = false;
 

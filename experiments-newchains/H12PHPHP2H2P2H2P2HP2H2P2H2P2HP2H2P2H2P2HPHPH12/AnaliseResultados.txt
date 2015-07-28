@@ -1,0 +1,96 @@
+NSGAII:
+C46:0.5222806468406144 -- Sem diferença vs (C10,C19) -- Com diferença (C29)
+C10:0.5192542676205721 -- Sem diferença vs (C46,C19) -- Com diferença (C29)
+C19:0.5137319484692017 -- Sem diferença vs (C46, C10, C29)
+.
+.
+.
+C29:0.45925592974555574
+
+
+SPEA2:
+
+C46:0.5472169586263612 -- Sem diferença vs (C25,C45)  -- Com diferença (C2)
+C25:0.5471933532374407 -- Sem diferença vs (C46,C45)  -- Com diferença (C2)
+C45:0.5444672905021418 -- Sem diferença vs (C46,C25)  -- Com diferença (C2)
+.
+.
+.
+C2:0.4745273401705896
+
+
+IBEA:
+
+C40:0.5960376226163696 -- Sem diferença vs (C31, C28) -- Com diferença vs (C14)
+C31:0.5846036167822706 -- Sem diferença vs (C40, C28) -- Com diferença vs (C14)
+C28:0.5813286238772334 -- Sem dieferença vs (C40,C31) -- Com diferença vs (C14)
+.
+.
+.
+C14:0.5045116481152481
+
+
+
+
+ PFKnown das 3 melhores configurações encontradas para cada algoritmo
+ (Fronteira resultante da união das fronteiras das 30 execuções)
+
+NSGAII - C46 - PFKnown 
+-27.0 9.219544457292887 
+-32.0 10.44030650891055 
+
+NSGAII - C10 - PFKnown 
+-34.0 11.180339887498949 
+-29.0 9.219544457292887 
+
+NSGAII - C19 - PFKnown 
+-33.0 9.219544457292887 
+
+
+SPEA2 - C46 - PFKnown
+-31.0 9.433981132056603 
+-30.0 9.219544457292887 
+-35.0 10.295630140987 
+
+SPEA2 - C45 - PFKnown
+-33.0 9.219544457292887 
+
+SPEA2 - C25 - PFKnown
+-31.0 9.433981132056603 
+-30.0 9.219544457292887 
+-28.0 8.602325267042627 
+
+
+
+IBEA - C40 - PFKnown 
+-37.0 9.433981132056603 
+
+IBEA - C31 - PFKnown 
+-33.0 9.433981132056603 
+-38.0 10.770329614269007 
+-31.0 8.94427190999916 
+
+IBEA - C28 - PFKnown 
+-35.0 10.0 
+-34.0 9.219544457292887 
+
+
+
+
+Configurações com maiores hypervolume e teste estatístico
+IBEA - C40:   0.5960376226163696
+NSGAII - C46: 0.5222806468406144
+SPEA2 - C46:  0.5472169586263612
+
+IBEA - C40 vs NSGAII - C46 -- Com diferença
+IBEA - C40 vs SPEA2 - C46 -- Sem diferença
+NSGAII - C46 vs SPEA2 - C46 -- Sem diferença
+
+
+
+
+
+
+
+
+
