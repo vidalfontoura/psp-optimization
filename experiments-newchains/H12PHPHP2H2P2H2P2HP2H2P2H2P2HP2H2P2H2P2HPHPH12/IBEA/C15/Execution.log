@@ -1,0 +1,42 @@
+Algorithm configured with: 
+Pop: 250
+Aux Pop: 200
+Crossover: SinglePointCrossover
+CrP: 0.9
+Mutation: BitFlipMutation
+MtP: 0.01
+Starting executions...
+Execution: 1
+Execution: 2
+Execution: 3
+Execution: 4
+Execution: 5
+Execution: 6
+Execution: 7
+Execution: 8
+Execution: 9
+Execution: 10
+Execution: 11
+Execution: 12
+Execution: 13
+Execution: 14
+Execution: 15
+Execution: 16
+Execution: 17
+Execution: 18
+Execution: 19
+Execution: 20
+Execution: 21
+Execution: 22
+Execution: 23
+Execution: 24
+Execution: 25
+Execution: 26
+Execution: 27
+Execution: 28
+Execution: 29
+Execution: 30
+
+End of execution for problem edu.ufpr.cbio.psp.problem.PSPProblem.
+Total time (seconds): 1823
+Writing results.

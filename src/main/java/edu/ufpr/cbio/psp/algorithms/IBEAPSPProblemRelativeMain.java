@@ -7,14 +7,14 @@ import org.uma.jmetal.core.Algorithm;
 import org.uma.jmetal.core.SolutionSet;
 import org.uma.jmetal.metaheuristic.multiobjective.ibea.IBEA;
 import org.uma.jmetal.operator.crossover.Crossover;
+import org.uma.jmetal.operator.crossover.SinglePointCrossover;
+import org.uma.jmetal.operator.mutation.BitFlipMutation;
 import org.uma.jmetal.operator.mutation.Mutation;
-import org.uma.jmetal.operator.mutation.PolynomialMutation;
 import org.uma.jmetal.operator.selection.BinaryTournament;
 import org.uma.jmetal.util.comparator.FitnessComparator;
 import org.uma.jmetal.util.fileoutput.SolutionSetOutput;
 
 import edu.ufpr.cbio.psp.problem.PSPProblem;
-import edu.ufpr.cbio.psp.problem.custom.operators.UniformCrossover;
 
 public class IBEAPSPProblemRelativeMain {
 
@@ -34,8 +34,9 @@ public class IBEAPSPProblemRelativeMain {
 
         HashMap<String, Double> parameters; // Operator parameters
 
-        String proteinChain =
-            "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
+        // String proteinChain =
+        // "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
+        String proteinChain = "PPPHHPPHHPPPPPHHHHHHHPPHHPPPPHHPPHPP";
         int numberOfObjectives = 2;
         problem = new PSPProblem(proteinChain, numberOfObjectives);
 
@@ -53,19 +54,20 @@ public class IBEAPSPProblemRelativeMain {
         double crossoverProbability = 0.9;
         // double crossoverDistributionIndex = 20.0;
         Crossover crossover;
-        // crossover = new
-        // SinglePointCrossover.Builder().setProbability(crossoverProbability).build();//1
+        crossover = new SinglePointCrossover.Builder().setProbability(crossoverProbability).build();// 1
         // crossover = new
         // IntegerTwoPointsCrossover.Builder().crossoverProbability(crossoverProbability).build();//2
-        crossover = new UniformCrossover.Builder().setCrossoverProbability(crossoverProbability).build();// 3
+        // crossover = new
+        // UniformCrossover.Builder().setCrossoverProbability(crossoverProbability).build();//
+        // 3
         builder.setCrossover(crossover);
 
         double mutationProbability = 0.01;
         // double mutationDistributionIndex = 20.0;
         Mutation mutation;
+        mutation = new BitFlipMutation.Builder().setProbability(mutationProbability).build();
         // mutation = new
-        // BitFlipMutation.Builder().setProbability(mutationProbability).build();
-        mutation = new PolynomialMutation.Builder().setProbability(mutationProbability).build();
+        // PolynomialMutation.Builder().setProbability(mutationProbability).build();
         builder.setMutation(mutation);
 
         builder.setSelection(new BinaryTournament.Builder().setComparator(new FitnessComparator()).build());

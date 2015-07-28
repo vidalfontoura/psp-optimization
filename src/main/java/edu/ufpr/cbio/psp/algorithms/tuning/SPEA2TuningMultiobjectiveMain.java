@@ -47,18 +47,17 @@ public class SPEA2TuningMultiobjectiveMain {
             proteinChain = args[10];
 
         } else {
-            populations = new String[] { "200", "250" };
+            populations = new String[] { "200" };
             maxEvaluations = new String[] { /* "40000", */"60000" };
-            crossovers = new String[] { "IntegerTwoPointsCrossover", "UniformCrossover" };
+            crossovers = new String[] { "SinglePointCrossover" };
             mutations = new String[] { "BitFlipMutation" };
             auxPopulations = new String[] { "200" };
             crossoverProbabilities = new String[] { "0.9" };
             mutationProbabilities = new String[] { "0.01" };
             executions = 30;
             numberOfThreads = 10;
-            resultsPath = "results";
-            proteinChain =
-                "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
+            resultsPath = "new-results";
+            proteinChain = "HHHHHHHHHHHHPHPHPPHHPPHHPPHPPHHPPHHPPHPPHHPPHHPPHPHPHHHHHHHHHHHH";
 
         }
 

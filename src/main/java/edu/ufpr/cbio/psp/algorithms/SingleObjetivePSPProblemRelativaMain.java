@@ -37,7 +37,7 @@ public class SingleObjetivePSPProblemRelativaMain {
         SolutionSetEvaluator evaluator;
 
         String path = "results/psp";
-        String algorithms = "SingleObjetive_100";
+        String algorithms = "SingleObjetive_100_3";
         int executions = 30;
 
         HashMap<String, Double> parameters; // Operator parameters
