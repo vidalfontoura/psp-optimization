@@ -58,5 +58,8 @@ public class ProteinChainUtils {
 
         String notationChain = ProteinChainUtils.getNotationByProteinChain("HHHHHHPPPPPPHHPPHPHHPPH");
         System.out.println(notationChain);
+
+        System.out.println(ProteinChainUtils.get("H6P6H2P2HPH2P2H"));
+
     }
 }
