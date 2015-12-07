@@ -64,10 +64,10 @@ public class PSPProblem extends org.uma.jmetal.core.Problem {
             maxPointsDistance = 100;
         }
         if (numberOfObjectives == 2) {
-            solution.setObjective(0, -topologicalContacts);
+            solution.setObjective(0, -1 * topologicalContacts);
             solution.setObjective(1, maxPointsDistance);
         } else if (numberOfObjectives == 1) {
-            solution.setObjective(0, -topologicalContacts);
+            solution.setObjective(0, -1 * topologicalContacts);
         }
 
     }
