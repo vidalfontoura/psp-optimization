@@ -47,18 +47,17 @@ public class IBEATuningMultiobjectiveMain {
             proteinChain = args[10];
 
         } else {
-            populations = new String[] { "200", "300" };
-            maxEvaluations = new String[] { /* "40000", */"60000" };
-            crossovers = new String[] { "SinlgePointCrossover", "IntegerTwoPointsCrossover", "UniformCrossover" };
+            populations = new String[] { "400" };
+            maxEvaluations = new String[] { /* "40000", */"100000" };
+            crossovers = new String[] { "SinglePointCrossover" };
             mutations = new String[] { "BitFlipMutation" };
             auxPopulations = new String[] { "200" };
             crossoverProbabilities = new String[] { "0.9" };
             mutationProbabilities = new String[] { "0.01" };
             executions = 30;
-            numberOfThreads = 10;
-            resultsPath = "results";
-            proteinChain =
-                "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
+            numberOfThreads = 4;
+            resultsPath = "results-finding-ibea2";
+            proteinChain = "HHHHHHHHHHHHPHPHPPHHPPHHPPHPPHHPPHHPPHPPHHPPHHPPHPHPHHHHHHHHHHHH";
 
         }
 
@@ -102,18 +101,17 @@ public class IBEATuningMultiobjectiveMain {
                                         Integer.valueOf(population),
                                         auxPopulation != null ? Integer.valueOf(auxPopulation) : null, crossoverName,
                                         crossoverProbability, mutationName, mutationProbability,
-                                        Integer.valueOf(maxEvaluation), algorithmDir.getPath() + File.separator
-                                            + allConfigurationsFileName);
+                                        Integer.valueOf(maxEvaluation),
+                                        algorithmDir.getPath() + File.separator + allConfigurationsFileName);
 
                                     // Creating the task to execute the
                                     // configuration
-                                    IBEAExecutingTask ibea2ExecutingTask =
-                                        new IBEAExecutingTask(problem, crossover, Double.valueOf(crossoverProbability),
-                                            crossoverName, mutation, Double.valueOf(mutationProbability), mutationName,
-                                            Integer.valueOf(population), auxPopulation != null
-                                                ? Integer.valueOf(auxPopulation) : null,
-                                            Integer.valueOf(maxEvaluation), proteinChain, algorithmDir.getPath(),
-                                            configuration, configurationFileName, executions);
+                                    IBEAExecutingTask ibea2ExecutingTask = new IBEAExecutingTask(problem, crossover,
+                                        Double.valueOf(crossoverProbability), crossoverName, mutation,
+                                        Double.valueOf(mutationProbability), mutationName, Integer.valueOf(population),
+                                        auxPopulation != null ? Integer.valueOf(auxPopulation) : null,
+                                        Integer.valueOf(maxEvaluation), proteinChain, algorithmDir.getPath(),
+                                        configuration, configurationFileName, executions);
                                     executor.execute(ibea2ExecutingTask);
                                     configuration++;
 
@@ -126,14 +124,15 @@ public class IBEATuningMultiobjectiveMain {
         }
 
         while (executedTasks < configuration) {
-            ConfigurationExecutionLogger.logMessage("Total tasks config " + configuration + " executed "
-                + executedTasks, algorithmDir + File.separator + executionLog);
+            ConfigurationExecutionLogger.logMessage(
+                "Total tasks config " + configuration + " executed " + executedTasks,
+                algorithmDir + File.separator + executionLog);
             System.out.println("Total tasks config " + configuration + " executed " + executedTasks);
             Thread.sleep(30000);
 
         }
-        ConfigurationExecutionLogger.logMessage("End of " + configuration + "configurations executions ", algorithmDir
-            + File.separator + executionLog);
+        ConfigurationExecutionLogger.logMessage("End of " + configuration + "configurations executions ",
+            algorithmDir + File.separator + executionLog);
         System.out.println("End of " + configuration + "configurations executions ");
         System.exit(0);
 
