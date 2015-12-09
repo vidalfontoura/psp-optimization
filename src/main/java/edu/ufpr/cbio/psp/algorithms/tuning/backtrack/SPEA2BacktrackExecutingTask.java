@@ -1,7 +1,4 @@
-/*
- * Copyright 2015, Charter Communications, All rights reserved.
- */
-package edu.ufpr.cbio.psp.algorithms.tunning.backtrack;
+package edu.ufpr.cbio.psp.algorithms.tuning.backtrack;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,18 +13,14 @@ import org.uma.jmetal.operator.selection.BinaryTournament2;
 import org.uma.jmetal.operator.selection.Selection;
 import org.uma.jmetal.util.fileoutput.SolutionSetOutput;
 
-import edu.ufpr.cbio.psp.algorithms.backtrack.IBEABacktrackInitialization;
+import edu.ufpr.cbio.psp.algorithms.backtrack.SPEA2BacktrackInitialization;
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
 import edu.ufpr.cbio.psp.problem.PSPProblem;
 
-/**
- *
- *
- * @author Vidal
- */
-public class IBEABacktrackExecutingTask implements Runnable {
+public class SPEA2BacktrackExecutingTask implements Runnable {
 
-    private static final String ALGORITHM_NAME = "IBEABacktrack";
+    private static final String ALGORITHM_NAME = "SPEA2Backtrack";
+
     private PSPProblem problem;
     private Crossover crossover;
     private double crossoverProbability;
@@ -45,7 +38,7 @@ public class IBEABacktrackExecutingTask implements Runnable {
     private int executions;
     private double backtrackPercentage;
 
-    public IBEABacktrackExecutingTask(PSPProblem problem, Crossover crossover, double crossoverProbability,
+    public SPEA2BacktrackExecutingTask(PSPProblem problem, Crossover crossover, double crossoverProbability,
         String crossoverName, Mutation mutation, double mutationProbability, String mutationName, int population,
         int auxPopulation, int maxEvaluation, String proteinChain, String algorithmPath, int configuration,
         String configurationFileName, int executions, double backtrackPercentage) {
@@ -71,7 +64,7 @@ public class IBEABacktrackExecutingTask implements Runnable {
     @Override
     public void run() {
 
-        IBEABacktrackInitialization.Builder builder = new IBEABacktrackInitialization.Builder(problem);
+        SPEA2BacktrackInitialization.Builder builder = new SPEA2BacktrackInitialization.Builder(problem);
 
         builder.setMutation(mutation);
         builder.setCrossover(crossover);
@@ -79,7 +72,7 @@ public class IBEABacktrackExecutingTask implements Runnable {
         builder.setPopulationSize(population);
         builder.setMaxEvaluations(maxEvaluation);
         builder.setAminoAcidSequence(proteinChain);
-        builder.setPercentageBacktrackPopulation(backtrackPercentage);
+        builder.setBacktrackPercentage(backtrackPercentage);
 
         File configurationDir = createDir(algorithmPath + File.separator + "C" + configuration);
         File objectivesDir = createDir(configurationDir.getPath() + File.separator);
@@ -105,7 +98,6 @@ public class IBEABacktrackExecutingTask implements Runnable {
                 outputDir + File.separator + configurationFileName, backtrackPercentage);
 
             for (int i = 0; i < executions; i++) {
-
                 executionOut.println("Execution: " + (i + 1));
                 Selection selection = new BinaryTournament2.Builder().build();
                 builder.setSelection(selection);
@@ -145,6 +137,7 @@ public class IBEABacktrackExecutingTask implements Runnable {
             SolutionSetOutput.printObjectivesToFile(allRuns, outputDir + "FUN.txt");
 
         } catch (Exception e) {
+
             ConfigurationExecutionLogger.logMessage("ERROR: Occured while executing C" + this.configuration + ":",
                 configurationDir.getPath() + File.separator + "Error.log");
             ConfigurationExecutionLogger.logMessage(ExceptionUtils.getStackTrace(e),
@@ -156,7 +149,7 @@ public class IBEABacktrackExecutingTask implements Runnable {
                 algorithmPath + File.separator + "AllExecutions.log");
 
         }
-        IBEABacktrackTuningMultiobjectiveMain.executedTasks++;
+        SPEA2BacktrackTuningMultiobjectiveMain.executedTasks++;
 
     }
 

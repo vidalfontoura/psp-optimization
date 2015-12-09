@@ -1,4 +1,7 @@
-package edu.ufpr.cbio.psp.algorithms.tunning.backtrack;
+/*
+ * Copyright 2015, Charter Communications, All rights reserved.
+ */
+package edu.ufpr.cbio.psp.algorithms.tuning.backtrack;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,22 +14,27 @@ import org.uma.jmetal.operator.crossover.Crossover;
 import org.uma.jmetal.operator.mutation.Mutation;
 import org.uma.jmetal.operator.selection.BinaryTournament2;
 import org.uma.jmetal.operator.selection.Selection;
-import org.uma.jmetal.util.evaluator.SequentialSolutionSetEvaluator;
 import org.uma.jmetal.util.fileoutput.SolutionSetOutput;
 
-import edu.ufpr.cbio.psp.algorithms.backtrack.NSGAIIBacktrakInitializationTemplate;
+import edu.ufpr.cbio.psp.algorithms.backtrack.IBEABacktrackInitialization;
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
 import edu.ufpr.cbio.psp.problem.PSPProblem;
 
-public class NSGAIIBacktrackExecutingTask implements Runnable {
+/**
+ *
+ *
+ * @author Vidal
+ */
+public class IBEABacktrackExecutingTask implements Runnable {
 
-    private static final String ALGORITHM_NAME = "NSGAIIBacktrack";
+    private static final String ALGORITHM_NAME = "IBEABacktrack";
     private PSPProblem problem;
     private Crossover crossover;
     private double crossoverProbability;
     private double mutationProbability;
     private Mutation mutation;
     private int population;
+    private int auxPopulation;
     private int maxEvaluation;
     private String crossoverName;
     private String mutationName;
@@ -37,15 +45,16 @@ public class NSGAIIBacktrackExecutingTask implements Runnable {
     private int executions;
     private double backtrackPercentage;
 
-    public NSGAIIBacktrackExecutingTask(PSPProblem problem, Crossover crossover, double crossoverProbability,
+    public IBEABacktrackExecutingTask(PSPProblem problem, Crossover crossover, double crossoverProbability,
         String crossoverName, Mutation mutation, double mutationProbability, String mutationName, int population,
-        int maxEvaluation, String proteinChain, String algorithmPath, int configuration, String configurationFileName,
-        int executions, double backtrackPercentage) {
+        int auxPopulation, int maxEvaluation, String proteinChain, String algorithmPath, int configuration,
+        String configurationFileName, int executions, double backtrackPercentage) {
 
         this.problem = problem;
         this.crossover = crossover;
         this.mutation = mutation;
         this.population = population;
+        this.auxPopulation = auxPopulation;
         this.maxEvaluation = maxEvaluation;
         this.proteinChain = proteinChain;
         this.crossoverName = crossoverName;
@@ -62,17 +71,15 @@ public class NSGAIIBacktrackExecutingTask implements Runnable {
     @Override
     public void run() {
 
-        SequentialSolutionSetEvaluator evaluator = new SequentialSolutionSetEvaluator();
-
-        NSGAIIBacktrakInitializationTemplate.Builder builder =
-            new NSGAIIBacktrakInitializationTemplate.Builder(problem, evaluator);
+        IBEABacktrackInitialization.Builder builder = new IBEABacktrackInitialization.Builder(problem);
 
         builder.setMutation(mutation);
         builder.setCrossover(crossover);
+        builder.setArchiveSize(auxPopulation);
         builder.setPopulationSize(population);
         builder.setMaxEvaluations(maxEvaluation);
         builder.setAminoAcidSequence(proteinChain);
-        builder.setBacktrackPercentage(backtrackPercentage);
+        builder.setPercentageBacktrackPopulation(backtrackPercentage);
 
         File configurationDir = createDir(algorithmPath + File.separator + "C" + configuration);
         File objectivesDir = createDir(configurationDir.getPath() + File.separator);
@@ -85,23 +92,24 @@ public class NSGAIIBacktrackExecutingTask implements Runnable {
             long allExecutionTime = 0;
             executionOut.println("Algorithm configured with: ");
             executionOut.println("Pop: " + population);
+            executionOut.println("Aux Pop: " + auxPopulation);
             executionOut.println("Crossover: " + crossoverName);
             executionOut.println("CrP: " + crossoverProbability);
             executionOut.println("Mutation: " + mutationName);
             executionOut.println("MtP: " + mutationProbability);
-            executionOut.println("BacktrackPercentage: " + backtrackPercentage);
+            executionOut.println("Backtrack Percentage: " + backtrackPercentage);
             executionOut.println("Starting executions...");
 
-            ConfigurationExecutionLogger.logConfiguration(ALGORITHM_NAME, population, 0, crossoverName,
+            ConfigurationExecutionLogger.logConfiguration(ALGORITHM_NAME, population, auxPopulation, crossoverName,
                 crossoverProbability, mutationName, mutationProbability, maxEvaluation, proteinChain,
-                outputDir + File.separator + configurationFileName, 0);
+                outputDir + File.separator + configurationFileName, backtrackPercentage);
 
             for (int i = 0; i < executions; i++) {
 
                 executionOut.println("Execution: " + (i + 1));
                 Selection selection = new BinaryTournament2.Builder().build();
                 builder.setSelection(selection);
-                Algorithm algorithm = builder.build("NSGAIIBacktrackInitialization");
+                Algorithm algorithm = builder.build();
 
                 long initTime = System.currentTimeMillis();
                 SolutionSet nonDominatedPopulation = algorithm.execute();
@@ -148,7 +156,7 @@ public class NSGAIIBacktrackExecutingTask implements Runnable {
                 algorithmPath + File.separator + "AllExecutions.log");
 
         }
-        NSGAIIBacktrackInitializationMultiobjectiveMain.executedTasks++;
+        IBEABacktrackTuningMultiobjectiveMain.executedTasks++;
 
     }
 

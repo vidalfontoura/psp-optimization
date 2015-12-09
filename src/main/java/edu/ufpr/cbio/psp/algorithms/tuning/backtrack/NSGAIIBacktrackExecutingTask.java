@@ -1,4 +1,4 @@
-package edu.ufpr.cbio.psp.algorithms.tunning.backtrack;
+package edu.ufpr.cbio.psp.algorithms.tuning.backtrack;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,23 +11,22 @@ import org.uma.jmetal.operator.crossover.Crossover;
 import org.uma.jmetal.operator.mutation.Mutation;
 import org.uma.jmetal.operator.selection.BinaryTournament2;
 import org.uma.jmetal.operator.selection.Selection;
+import org.uma.jmetal.util.evaluator.SequentialSolutionSetEvaluator;
 import org.uma.jmetal.util.fileoutput.SolutionSetOutput;
 
-import edu.ufpr.cbio.psp.algorithms.backtrack.SPEA2BacktrackInitialization;
+import edu.ufpr.cbio.psp.algorithms.backtrack.NSGAIIBacktrakInitializationTemplate;
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
 import edu.ufpr.cbio.psp.problem.PSPProblem;
 
-public class SPEA2BacktrackExecutingTask implements Runnable {
+public class NSGAIIBacktrackExecutingTask implements Runnable {
 
-    private static final String ALGORITHM_NAME = "SPEA2Backtrack";
-
+    private static final String ALGORITHM_NAME = "NSGAIIBacktrack";
     private PSPProblem problem;
     private Crossover crossover;
     private double crossoverProbability;
     private double mutationProbability;
     private Mutation mutation;
     private int population;
-    private int auxPopulation;
     private int maxEvaluation;
     private String crossoverName;
     private String mutationName;
@@ -38,16 +37,15 @@ public class SPEA2BacktrackExecutingTask implements Runnable {
     private int executions;
     private double backtrackPercentage;
 
-    public SPEA2BacktrackExecutingTask(PSPProblem problem, Crossover crossover, double crossoverProbability,
+    public NSGAIIBacktrackExecutingTask(PSPProblem problem, Crossover crossover, double crossoverProbability,
         String crossoverName, Mutation mutation, double mutationProbability, String mutationName, int population,
-        int auxPopulation, int maxEvaluation, String proteinChain, String algorithmPath, int configuration,
-        String configurationFileName, int executions, double backtrackPercentage) {
+        int maxEvaluation, String proteinChain, String algorithmPath, int configuration, String configurationFileName,
+        int executions, double backtrackPercentage) {
 
         this.problem = problem;
         this.crossover = crossover;
         this.mutation = mutation;
         this.population = population;
-        this.auxPopulation = auxPopulation;
         this.maxEvaluation = maxEvaluation;
         this.proteinChain = proteinChain;
         this.crossoverName = crossoverName;
@@ -64,11 +62,13 @@ public class SPEA2BacktrackExecutingTask implements Runnable {
     @Override
     public void run() {
 
-        SPEA2BacktrackInitialization.Builder builder = new SPEA2BacktrackInitialization.Builder(problem);
+        SequentialSolutionSetEvaluator evaluator = new SequentialSolutionSetEvaluator();
+
+        NSGAIIBacktrakInitializationTemplate.Builder builder =
+            new NSGAIIBacktrakInitializationTemplate.Builder(problem, evaluator);
 
         builder.setMutation(mutation);
         builder.setCrossover(crossover);
-        builder.setArchiveSize(auxPopulation);
         builder.setPopulationSize(population);
         builder.setMaxEvaluations(maxEvaluation);
         builder.setAminoAcidSequence(proteinChain);
@@ -85,23 +85,23 @@ public class SPEA2BacktrackExecutingTask implements Runnable {
             long allExecutionTime = 0;
             executionOut.println("Algorithm configured with: ");
             executionOut.println("Pop: " + population);
-            executionOut.println("Aux Pop: " + auxPopulation);
             executionOut.println("Crossover: " + crossoverName);
             executionOut.println("CrP: " + crossoverProbability);
             executionOut.println("Mutation: " + mutationName);
             executionOut.println("MtP: " + mutationProbability);
-            executionOut.println("Backtrack Percentage: " + backtrackPercentage);
+            executionOut.println("BacktrackPercentage: " + backtrackPercentage);
             executionOut.println("Starting executions...");
 
-            ConfigurationExecutionLogger.logConfiguration(ALGORITHM_NAME, population, auxPopulation, crossoverName,
+            ConfigurationExecutionLogger.logConfiguration(ALGORITHM_NAME, population, 0, crossoverName,
                 crossoverProbability, mutationName, mutationProbability, maxEvaluation, proteinChain,
-                outputDir + File.separator + configurationFileName, backtrackPercentage);
+                outputDir + File.separator + configurationFileName, 0);
 
             for (int i = 0; i < executions; i++) {
+
                 executionOut.println("Execution: " + (i + 1));
                 Selection selection = new BinaryTournament2.Builder().build();
                 builder.setSelection(selection);
-                Algorithm algorithm = builder.build();
+                Algorithm algorithm = builder.build("NSGAIIBacktrackInitialization");
 
                 long initTime = System.currentTimeMillis();
                 SolutionSet nonDominatedPopulation = algorithm.execute();
@@ -137,7 +137,6 @@ public class SPEA2BacktrackExecutingTask implements Runnable {
             SolutionSetOutput.printObjectivesToFile(allRuns, outputDir + "FUN.txt");
 
         } catch (Exception e) {
-
             ConfigurationExecutionLogger.logMessage("ERROR: Occured while executing C" + this.configuration + ":",
                 configurationDir.getPath() + File.separator + "Error.log");
             ConfigurationExecutionLogger.logMessage(ExceptionUtils.getStackTrace(e),
@@ -149,7 +148,7 @@ public class SPEA2BacktrackExecutingTask implements Runnable {
                 algorithmPath + File.separator + "AllExecutions.log");
 
         }
-        SPEA2BacktrackTuningMultiobjectiveMain.executedTasks++;
+        NSGAIIBacktrackInitializationMultiobjectiveMain.executedTasks++;
 
     }
 

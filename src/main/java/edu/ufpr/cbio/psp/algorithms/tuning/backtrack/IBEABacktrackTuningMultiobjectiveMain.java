@@ -1,4 +1,4 @@
-package edu.ufpr.cbio.psp.algorithms.tunning.backtrack;
+package edu.ufpr.cbio.psp.algorithms.tuning.backtrack;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
