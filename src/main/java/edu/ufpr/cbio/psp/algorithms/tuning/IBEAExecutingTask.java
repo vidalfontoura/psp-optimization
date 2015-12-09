@@ -89,7 +89,7 @@ public class IBEAExecutingTask implements Runnable {
 
             ConfigurationExecutionLogger.logConfiguration(ALGORITHM_NAME, population, auxPopulation, crossoverName,
                 crossoverProbability, mutationName, mutationProbability, maxEvaluation, proteinChain,
-                outputDir + File.separator + configurationFileName);
+                outputDir + File.separator + configurationFileName, 0);
 
             for (int i = 0; i < executions; i++) {
 

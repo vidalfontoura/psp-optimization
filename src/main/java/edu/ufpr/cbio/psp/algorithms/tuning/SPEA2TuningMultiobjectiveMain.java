@@ -8,11 +8,17 @@ import org.uma.jmetal.operator.crossover.Crossover;
 import org.uma.jmetal.operator.crossover.SinglePointCrossover;
 import org.uma.jmetal.operator.mutation.BitFlipMutation;
 import org.uma.jmetal.operator.mutation.Mutation;
+import org.uma.jmetal.util.JMetalException;
 
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
 import edu.ufpr.cbio.psp.problem.PSPProblem;
 import edu.ufpr.cbio.psp.problem.custom.operators.IntegerTwoPointsCrossover;
 import edu.ufpr.cbio.psp.problem.custom.operators.UniformCrossover;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.LocalMoveOperator;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.LoopMoveOperator;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.MultiPointsCrossover;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.OppositeMoveOperator;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.SegmentMutationOperator;
 import edu.ufpr.cbio.psp.problem.utils.ProteinChainUtils;
 
 public class SPEA2TuningMultiobjectiveMain {
@@ -101,19 +107,17 @@ public class SPEA2TuningMultiobjectiveMain {
                                         Integer.valueOf(population),
                                         auxPopulation != null ? Integer.valueOf(auxPopulation) : null, crossoverName,
                                         crossoverProbability, mutationName, mutationProbability,
-                                        Integer.valueOf(maxEvaluation), algorithmDir.getPath() + File.separator
-                                            + allConfigurationsFileName);
+                                        Integer.valueOf(maxEvaluation),
+                                        algorithmDir.getPath() + File.separator + allConfigurationsFileName, 0);
 
                                     // Creating the task to execute the
                                     // configuration
-                                    SPEA2ExecutingTask spea2ExecutingTask =
-                                        new SPEA2ExecutingTask(problem, crossover,
-                                            Double.valueOf(crossoverProbability), crossoverName, mutation,
-                                            Double.valueOf(mutationProbability), mutationName,
-                                            Integer.valueOf(population), auxPopulation != null
-                                                ? Integer.valueOf(auxPopulation) : null,
-                                            Integer.valueOf(maxEvaluation), proteinChain, algorithmDir.getPath(),
-                                            configuration, configurationFileName, executions);
+                                    SPEA2ExecutingTask spea2ExecutingTask = new SPEA2ExecutingTask(problem, crossover,
+                                        Double.valueOf(crossoverProbability), crossoverName, mutation,
+                                        Double.valueOf(mutationProbability), mutationName, Integer.valueOf(population),
+                                        auxPopulation != null ? Integer.valueOf(auxPopulation) : null,
+                                        Integer.valueOf(maxEvaluation), proteinChain, algorithmDir.getPath(),
+                                        configuration, configurationFileName, executions);
                                     executor.execute(spea2ExecutingTask);
                                     configuration++;
 
@@ -126,14 +130,15 @@ public class SPEA2TuningMultiobjectiveMain {
         }
 
         while (executedTasks < configuration) {
-            ConfigurationExecutionLogger.logMessage("Total tasks config " + configuration + " executed "
-                + executedTasks, algorithmDir + File.separator + executionLog);
+            ConfigurationExecutionLogger.logMessage(
+                "Total tasks config " + configuration + " executed " + executedTasks,
+                algorithmDir + File.separator + executionLog);
             System.out.println("Total tasks config " + configuration + " executed " + executedTasks);
             Thread.sleep(30000);
 
         }
-        ConfigurationExecutionLogger.logMessage("End of " + configuration + "configurations executions ", algorithmDir
-            + File.separator + executionLog);
+        ConfigurationExecutionLogger.logMessage("End of " + configuration + "configurations executions ",
+            algorithmDir + File.separator + executionLog);
         System.out.println("End of " + configuration + "configurations executions ");
         System.exit(0);
 
@@ -156,6 +161,13 @@ public class SPEA2TuningMultiobjectiveMain {
                 crossover = new UniformCrossover.Builder().setCrossoverProbability(crossoverProbability).build();
                 break;
             }
+            case "MultiPointsCrossover": {
+                crossover = new MultiPointsCrossover(crossoverProbability);
+                break;
+            }
+            default: {
+                throw new JMetalException("Crossover operator not supported : " + crossoverName);
+            }
 
         }
         return crossover;
@@ -168,6 +180,25 @@ public class SPEA2TuningMultiobjectiveMain {
             case "BitFlipMutation": {
                 mutation = new BitFlipMutation.Builder().setProbability(mutationProbability).build();
                 break;
+            }
+            case "LoopMoveOperator": {
+                mutation = new LoopMoveOperator(mutationProbability);
+                break;
+            }
+            case "LocalMoveOperator": {
+                mutation = new LocalMoveOperator(mutationProbability);
+                break;
+            }
+            case "SegmentMutation": {
+                mutation = new SegmentMutationOperator(mutationProbability);
+                break;
+            }
+            case "OppositeMoveOperator": {
+                mutation = new OppositeMoveOperator(mutationProbability);
+                break;
+            }
+            default: {
+                throw new JMetalException("Mutation operator not supported : " + mutationName);
             }
         }
         return mutation;

@@ -68,11 +68,11 @@
             <version>5.0-Beta-16-SNAPSHOT</version>
             
 		</dependency>
-		<dependency>
+		<!--  <dependency>
 			<groupId>org.javaplot</groupId> 
 			<artifactId>javaplot</artifactId> 
 			<version>1.0</version> 
-		</dependency>
+		</dependency>-->
 		<dependency> 
 			<groupId>org.moeaframework</groupId>
 			<artifactId>moeaframework</artifactId>
@@ -105,22 +105,32 @@
                         </goals>
                         <configuration>
                             <programs>
-                                <program>
+                                <!--  <program>
                                     <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.SPEA2TuningMultiobjectiveMain</mainClass>
                                     <name>spea2-daemon</name>
-                                </program>
-                                 <program>
+                                </program>-->
+                                <!--   <program>
                                     <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.SPEA2HHTuningMultiobjectiveMain</mainClass>
                                     <name>spea2hh-daemon</name>
-                                </program>
+                                </program>-->
                                 <program>
-                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.IBEATuningMultiobjectiveMain</mainClass>
+                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.backtrack.IBEABacktrackTuningMultiobjectiveMain</mainClass>
+                                    <name>nsgaii-daemon</name>
+                                </program>
+                                
+                                 <program>
+                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.backtrack.NSGAIIBacktrackInitializationMultiobjectiveMain</mainClass>
                                     <name>ibea-daemon</name>
                                 </program>
-                                <program>
+                                
+                                  <program>
+                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.backtrack.SPEA2BacktrackTuningMultiobjectiveMain</mainClass>
+                                    <name>spea2-daemon</name>
+                                </program>
+                               <!--   <program>
                                     <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.IBEAHHTuningMultiobjectiveMain</mainClass>
                                     <name>ibeahh-daemon</name>
-                                </program>
+                                </program>-->
                             </programs>
                             <repositoryLayout>flat</repositoryLayout>
                             <!-- <useWildcardClassPath>true</useWildcardClassPath> -->

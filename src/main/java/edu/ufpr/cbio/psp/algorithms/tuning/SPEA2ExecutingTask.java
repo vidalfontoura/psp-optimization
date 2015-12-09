@@ -74,9 +74,8 @@ public class SPEA2ExecutingTask implements Runnable {
         File objectivesDir = createDir(configurationDir.getPath() + File.separator);
         String outputDir = objectivesDir.getPath() + File.separator;
 
-        try (
-            PrintStream executionOut =
-                new PrintStream(new FileOutputStream(configurationDir.getPath() + File.separator + "Execution.log"))) {
+        try (PrintStream executionOut =
+            new PrintStream(new FileOutputStream(configurationDir.getPath() + File.separator + "Execution.log"))) {
 
             SolutionSet allRuns = new SolutionSet();
             long allExecutionTime = 0;
@@ -90,8 +89,8 @@ public class SPEA2ExecutingTask implements Runnable {
             executionOut.println("Starting executions...");
 
             ConfigurationExecutionLogger.logConfiguration(ALGORITHM_NAME, population, auxPopulation, crossoverName,
-                crossoverProbability, mutationName, mutationProbability, maxEvaluation, proteinChain, outputDir
-                    + File.separator + configurationFileName);
+                crossoverProbability, mutationName, mutationProbability, maxEvaluation, proteinChain,
+                outputDir + File.separator + configurationFileName, 0);
 
             for (int i = 0; i < executions; i++) {
                 executionOut.println("Execution: " + (i + 1));
@@ -111,10 +110,10 @@ public class SPEA2ExecutingTask implements Runnable {
                 problem.removeDominateds(nonDominatedPopulation);
                 problem.removeDuplicates(nonDominatedPopulation);
 
-                SolutionSetOutput.printVariablesToFile(nonDominatedPopulation, executionDirectory + File.separator
-                    + "VAR.txt");
-                SolutionSetOutput.printObjectivesToFile(nonDominatedPopulation, executionDirectory + File.separator
-                    + "FUN.txt");
+                SolutionSetOutput.printVariablesToFile(nonDominatedPopulation,
+                    executionDirectory + File.separator + "VAR.txt");
+                SolutionSetOutput.printObjectivesToFile(nonDominatedPopulation,
+                    executionDirectory + File.separator + "FUN.txt");
 
                 allRuns = allRuns.union(nonDominatedPopulation);
             }
@@ -123,8 +122,8 @@ public class SPEA2ExecutingTask implements Runnable {
             executionOut.println("End of execution for problem " + problem.getClass().getName() + ".");
             executionOut.println("Total time (seconds): " + allExecutionTime / 1000);
             executionOut.println("Writing results.");
-            ConfigurationExecutionLogger.logEndOfExecution(executions, allExecutionTime, outputDir + File.separator
-                + configurationFileName);
+            ConfigurationExecutionLogger.logEndOfExecution(executions, allExecutionTime,
+                outputDir + File.separator + configurationFileName);
 
             problem.removeDominateds(allRuns);
             problem.removeDuplicates(allRuns);
@@ -136,13 +135,13 @@ public class SPEA2ExecutingTask implements Runnable {
 
             ConfigurationExecutionLogger.logMessage("ERROR: Occured while executing C" + this.configuration + ":",
                 configurationDir.getPath() + File.separator + "Error.log");
-            ConfigurationExecutionLogger.logMessage(ExceptionUtils.getStackTrace(e), configurationDir.getPath()
-                + File.separator + "Error.log");
+            ConfigurationExecutionLogger.logMessage(ExceptionUtils.getStackTrace(e),
+                configurationDir.getPath() + File.separator + "Error.log");
 
             ConfigurationExecutionLogger.logMessage("ERROR: occured while executing C" + this.configuration + ":",
                 algorithmPath + File.separator + "AllExecutions.log");
-            ConfigurationExecutionLogger.logMessage(ExceptionUtils.getStackTrace(e), algorithmPath + File.separator
-                + "AllExecutions.log");
+            ConfigurationExecutionLogger.logMessage(ExceptionUtils.getStackTrace(e),
+                algorithmPath + File.separator + "AllExecutions.log");
 
         }
         SPEA2TuningMultiobjectiveMain.executedTasks++;
