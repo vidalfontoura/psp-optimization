@@ -64,11 +64,11 @@ public class NSGAIIBacktrackInitializationMultiobjectiveMain {
         } else {
             populations = new String[] { "400" };
             maxEvaluations = new String[] { /* "40000", */"100000" };
-            crossovers = new String[] { "SinglePointCrossover" };
-            mutations = new String[] { "BitFlipMutation" };
+            crossovers = new String[] { "MultiPointsCrossover" };
+            mutations = new String[] { "LocalMoveOperator" };
             auxPopulations = new String[] { "200" };
             crossoverProbabilities = new String[] { "0.9" };
-            mutationProbabilities = new String[] { "0.01" };
+            mutationProbabilities = new String[] { "0.5" };
             executions = 30;
             numberOfThreads = 4;
             resultsPath = "results-test-backtrack-nsgaii";

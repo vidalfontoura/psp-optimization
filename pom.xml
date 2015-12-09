@@ -114,12 +114,12 @@
                                     <name>spea2hh-daemon</name>
                                 </program>-->
                                 <program>
-                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.backtrack.IBEABacktrackTuningMultiobjectiveMain</mainClass>
+                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.backtrack.NSGAIIBacktrackInitializationMultiobjectiveMain</mainClass>
                                     <name>nsgaii-daemon</name>
                                 </program>
                                 
                                  <program>
-                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.backtrack.NSGAIIBacktrackInitializationMultiobjectiveMain</mainClass>
+                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.backtrack.IBEABacktrackTuningMultiobjectiveMain</mainClass>
                                     <name>ibea-daemon</name>
                                 </program>
                                 
