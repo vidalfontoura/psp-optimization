@@ -42,7 +42,7 @@ public class NSGAIIBacktrackInitializationMultiobjectiveMain {
 
         double[] backtrackPercentages = null;
         int evaluatorThreads = 0;
-        if (args.length == 13) {
+        if (args.length == 12) {
             populations = args[0].split(",");
             maxEvaluations = args[1].split(",");
             crossovers = args[2].split(",");
@@ -60,7 +60,6 @@ public class NSGAIIBacktrackInitializationMultiobjectiveMain {
             for (int i = 0; i < vet.length; i++) {
                 backtrackPercentages[i] = Double.valueOf(vet[i]);
             }
-            evaluatorThreads = Integer.valueOf(args[12]);
 
         } else {
             populations = new String[] { "400" };
@@ -75,10 +74,9 @@ public class NSGAIIBacktrackInitializationMultiobjectiveMain {
             resultsPath = "results-test-backtrack-nsgaii";
             proteinChain = "HHHHHHHHHHHHPHPHPPHHPPHHPPHPPHHPPHHPPHPPHHPPHHPPHPHPHHHHHHHHHHHH";
             backtrackPercentages = new double[] { 20.0 };
-            evaluatorThreads = 5;
 
         }
-
+        evaluatorThreads = 1;
         ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
         int numberOfObjectives = 2;
 
@@ -132,8 +130,7 @@ public class NSGAIIBacktrackInitializationMultiobjectiveMain {
                                                 Double.valueOf(mutationProbability), mutationName,
                                                 Integer.valueOf(population), Integer.valueOf(maxEvaluation),
                                                 proteinChain, algorithmDir.getPath(), configuration,
-                                                configurationFileName, executions, evaluatorThreads,
-                                                backtrackPercentages[l]);
+                                                configurationFileName, executions, backtrackPercentages[l]);
 
                                         executor.execute(nsgaiiExecutingTask);
                                         configuration++;

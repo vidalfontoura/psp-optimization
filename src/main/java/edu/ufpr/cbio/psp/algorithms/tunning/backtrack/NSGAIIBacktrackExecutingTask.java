@@ -11,7 +11,7 @@ import org.uma.jmetal.operator.crossover.Crossover;
 import org.uma.jmetal.operator.mutation.Mutation;
 import org.uma.jmetal.operator.selection.BinaryTournament2;
 import org.uma.jmetal.operator.selection.Selection;
-import org.uma.jmetal.util.evaluator.MultithreadedSolutionSetEvaluator;
+import org.uma.jmetal.util.evaluator.SequentialSolutionSetEvaluator;
 import org.uma.jmetal.util.fileoutput.SolutionSetOutput;
 
 import edu.ufpr.cbio.psp.algorithms.backtrack.NSGAIIBacktrakInitializationTemplate;
@@ -35,13 +35,12 @@ public class NSGAIIBacktrackExecutingTask implements Runnable {
     private int configuration;
     private String configurationFileName;
     private int executions;
-    private int evaluatorThreads;
     private double backtrackPercentage;
 
     public NSGAIIBacktrackExecutingTask(PSPProblem problem, Crossover crossover, double crossoverProbability,
         String crossoverName, Mutation mutation, double mutationProbability, String mutationName, int population,
         int maxEvaluation, String proteinChain, String algorithmPath, int configuration, String configurationFileName,
-        int executions, int evaluatorThreads, double backtrackPercentage) {
+        int executions, double backtrackPercentage) {
 
         this.problem = problem;
         this.crossover = crossover;
@@ -57,14 +56,13 @@ public class NSGAIIBacktrackExecutingTask implements Runnable {
         this.configuration = configuration;
         this.configurationFileName = configurationFileName;
         this.executions = executions;
-        this.evaluatorThreads = evaluatorThreads;
         this.backtrackPercentage = backtrackPercentage;
     }
 
     @Override
     public void run() {
 
-        MultithreadedSolutionSetEvaluator evaluator = new MultithreadedSolutionSetEvaluator(evaluatorThreads, problem);
+        SequentialSolutionSetEvaluator evaluator = new SequentialSolutionSetEvaluator();
 
         NSGAIIBacktrakInitializationTemplate.Builder builder =
             new NSGAIIBacktrakInitializationTemplate.Builder(problem, evaluator);
