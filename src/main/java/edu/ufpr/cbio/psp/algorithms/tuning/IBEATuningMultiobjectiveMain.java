@@ -8,11 +8,17 @@ import org.uma.jmetal.operator.crossover.Crossover;
 import org.uma.jmetal.operator.crossover.SinglePointCrossover;
 import org.uma.jmetal.operator.mutation.BitFlipMutation;
 import org.uma.jmetal.operator.mutation.Mutation;
+import org.uma.jmetal.util.JMetalException;
 
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
 import edu.ufpr.cbio.psp.problem.PSPProblem;
 import edu.ufpr.cbio.psp.problem.custom.operators.IntegerTwoPointsCrossover;
 import edu.ufpr.cbio.psp.problem.custom.operators.UniformCrossover;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.LocalMoveOperator;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.LoopMoveOperator;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.MultiPointsCrossover;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.OppositeMoveOperator;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.SegmentMutationOperator;
 import edu.ufpr.cbio.psp.problem.utils.ProteinChainUtils;
 
 public class IBEATuningMultiobjectiveMain {
@@ -102,7 +108,7 @@ public class IBEATuningMultiobjectiveMain {
                                         auxPopulation != null ? Integer.valueOf(auxPopulation) : null, crossoverName,
                                         crossoverProbability, mutationName, mutationProbability,
                                         Integer.valueOf(maxEvaluation),
-                                        algorithmDir.getPath() + File.separator + allConfigurationsFileName);
+                                        algorithmDir.getPath() + File.separator + allConfigurationsFileName, 0);
 
                                     // Creating the task to execute the
                                     // configuration
@@ -155,6 +161,13 @@ public class IBEATuningMultiobjectiveMain {
                 crossover = new UniformCrossover.Builder().setCrossoverProbability(crossoverProbability).build();
                 break;
             }
+            case "MultiPointsCrossover": {
+                crossover = new MultiPointsCrossover(crossoverProbability);
+                break;
+            }
+            default: {
+                throw new JMetalException("Crossover operator not supported : " + crossoverName);
+            }
 
         }
         return crossover;
@@ -167,6 +180,25 @@ public class IBEATuningMultiobjectiveMain {
             case "BitFlipMutation": {
                 mutation = new BitFlipMutation.Builder().setProbability(mutationProbability).build();
                 break;
+            }
+            case "LoopMoveOperator": {
+                mutation = new LoopMoveOperator(mutationProbability);
+                break;
+            }
+            case "LocalMoveOperator": {
+                mutation = new LocalMoveOperator(mutationProbability);
+                break;
+            }
+            case "SegmentMutation": {
+                mutation = new SegmentMutationOperator(mutationProbability);
+                break;
+            }
+            case "OppositeMoveOperator": {
+                mutation = new OppositeMoveOperator(mutationProbability);
+                break;
+            }
+            default: {
+                throw new JMetalException("Mutation operator not supported : " + mutationName);
             }
         }
         return mutation;

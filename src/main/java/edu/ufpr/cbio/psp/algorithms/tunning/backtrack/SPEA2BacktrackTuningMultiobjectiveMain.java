@@ -1,4 +1,4 @@
-package edu.ufpr.cbio.psp.algorithms.tuning;
+package edu.ufpr.cbio.psp.algorithms.tunning.backtrack;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
@@ -21,9 +21,9 @@ import edu.ufpr.cbio.psp.problem.custom.operators.recent.OppositeMoveOperator;
 import edu.ufpr.cbio.psp.problem.custom.operators.recent.SegmentMutationOperator;
 import edu.ufpr.cbio.psp.problem.utils.ProteinChainUtils;
 
-public class SPEA2TuningMultiobjectiveMain {
+public class SPEA2BacktrackTuningMultiobjectiveMain {
 
-    private static final String ALGORITHM_NAME = "SPEA2";
+    private static final String ALGORITHM_NAME = "SPEA2Backtrack";
     public static int executedTasks = 0;
 
     public static void main(String[] args) throws Exception {
@@ -39,7 +39,9 @@ public class SPEA2TuningMultiobjectiveMain {
         int numberOfThreads = 0;
         String resultsPath = null;
         int executions = 0;
-        if (args.length == 11) {
+        double[] backtrackPercentages = null;
+
+        if (args.length == 12) {
             populations = args[0].split(",");
             maxEvaluations = args[1].split(",");
             crossovers = args[2].split(",");
@@ -51,19 +53,25 @@ public class SPEA2TuningMultiobjectiveMain {
             numberOfThreads = Integer.valueOf(args[8]);
             resultsPath = args[9];
             proteinChain = args[10];
+            String[] vet = args[11].split(",");
+            backtrackPercentages = new double[vet.length];
+            for (int i = 0; i < vet.length; i++) {
+                backtrackPercentages[i] = Double.valueOf(vet[i]);
+            }
 
         } else {
-            populations = new String[] { "200" };
-            maxEvaluations = new String[] { /* "40000", */"60000" };
+            populations = new String[] { "400" };
+            maxEvaluations = new String[] { /* "40000", */"100000" };
             crossovers = new String[] { "SinglePointCrossover" };
             mutations = new String[] { "BitFlipMutation" };
             auxPopulations = new String[] { "200" };
             crossoverProbabilities = new String[] { "0.9" };
             mutationProbabilities = new String[] { "0.01" };
             executions = 30;
-            numberOfThreads = 10;
-            resultsPath = "new-results";
+            numberOfThreads = 4;
+            resultsPath = "results-test-backtrack-spea2";
             proteinChain = "HHHHHHHHHHHHPHPHPPHHPPHHPPHPPHHPPHHPPHPPHHPPHHPPHPHPHHHHHHHHHHHH";
+            backtrackPercentages = new double[] { 20.0 };
 
         }
 
@@ -100,26 +108,33 @@ public class SPEA2TuningMultiobjectiveMain {
                                     String mutationName = mutations[t];
                                     Mutation mutation = getMutation(mutationName, mutationProbability);
 
-                                    // Output files
+                                    for (int l = 0; l < backtrackPercentages.length; l++) {
 
-                                    // All configurations log
-                                    ConfigurationExecutionLogger.logAllConfiguration(configuration, ALGORITHM_NAME,
-                                        Integer.valueOf(population),
-                                        auxPopulation != null ? Integer.valueOf(auxPopulation) : null, crossoverName,
-                                        crossoverProbability, mutationName, mutationProbability,
-                                        Integer.valueOf(maxEvaluation),
-                                        algorithmDir.getPath() + File.separator + allConfigurationsFileName, 0);
+                                        // Output files
 
-                                    // Creating the task to execute the
-                                    // configuration
-                                    SPEA2ExecutingTask spea2ExecutingTask = new SPEA2ExecutingTask(problem, crossover,
-                                        Double.valueOf(crossoverProbability), crossoverName, mutation,
-                                        Double.valueOf(mutationProbability), mutationName, Integer.valueOf(population),
-                                        auxPopulation != null ? Integer.valueOf(auxPopulation) : null,
-                                        Integer.valueOf(maxEvaluation), proteinChain, algorithmDir.getPath(),
-                                        configuration, configurationFileName, executions);
-                                    executor.execute(spea2ExecutingTask);
-                                    configuration++;
+                                        // All configurations log
+                                        ConfigurationExecutionLogger.logAllConfiguration(configuration, ALGORITHM_NAME,
+                                            Integer.valueOf(population),
+                                            auxPopulation != null ? Integer.valueOf(auxPopulation) : null,
+                                            crossoverName, crossoverProbability, mutationName, mutationProbability,
+                                            Integer.valueOf(maxEvaluation),
+                                            algorithmDir.getPath() + File.separator + allConfigurationsFileName,
+                                            backtrackPercentages[l]);
+
+                                        // Creating the task to execute the
+                                        // configuration
+                                        SPEA2BacktrackExecutingTask ibea2ExecutingTask =
+                                            new SPEA2BacktrackExecutingTask(problem, crossover,
+                                                Double.valueOf(crossoverProbability), crossoverName, mutation,
+                                                Double.valueOf(mutationProbability), mutationName,
+                                                Integer.valueOf(population),
+                                                auxPopulation != null ? Integer.valueOf(auxPopulation) : null,
+                                                Integer.valueOf(maxEvaluation), proteinChain, algorithmDir.getPath(),
+                                                configuration, configurationFileName, executions,
+                                                backtrackPercentages[l]);
+                                        executor.execute(ibea2ExecutingTask);
+                                        configuration++;
+                                    }
 
                                 }
                             }

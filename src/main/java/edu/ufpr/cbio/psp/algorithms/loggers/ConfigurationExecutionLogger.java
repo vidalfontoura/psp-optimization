@@ -18,7 +18,8 @@ public class ConfigurationExecutionLogger {
 
     public static void logConfiguration(String algorithm, int population, Integer auxPopulation, String crosssover,
                                         double crossoverProbability, String mutation, double mutationProbability,
-                                        int maxEvaluations, String proteinChain, String fileName) throws IOException {
+                                        int maxEvaluations, String proteinChain, String fileName,
+                                        double backtrackPercentage) throws IOException {
 
         File outputFile = new File(fileName);
         try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(outputFile))) {
@@ -40,6 +41,8 @@ public class ConfigurationExecutionLogger {
                 fileWriter.append("Aux Pop: " + auxPopulation);
                 fileWriter.newLine();
             }
+            fileWriter.append("Backtrack Percentage: " + backtrackPercentage);
+            fileWriter.newLine();
             fileWriter.write("ProteinChain: " + proteinChain);
             fileWriter.newLine();
 
@@ -94,15 +97,16 @@ public class ConfigurationExecutionLogger {
 
     public static void logAllConfiguration(int configId, String algoritm, int population, Integer auxPopulation,
                                            String crosssover, double crossoverProbability, String mutation,
-                                           double mutationProbability, int maxEvaluations, String fileName)
-        throws IOException {
+                                           double mutationProbability, int maxEvaluations, String fileName,
+                                           double backtrackPercentage) throws IOException {
 
         File outputFile = new File(fileName);
 
         try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(outputFile, true))) {
 
             fileWriter.write("C" + configId + ": " + population + "," + auxPopulation + "," + maxEvaluations + ","
-                + crosssover + "," + crossoverProbability + "," + mutation + "," + mutationProbability);
+                + crosssover + "," + crossoverProbability + "," + mutation + "," + mutationProbability + ", bt="
+                + backtrackPercentage);
             fileWriter.newLine();
         }
     }
@@ -127,8 +131,8 @@ public class ConfigurationExecutionLogger {
 
         File outputFile = new File(fileName);
         try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(outputFile, true))) {
-            fileWriter.write("Total time taken to execute " + numberOfExecutions + " times : " + allExecutionTime
-                / 1000 + "(seconds)");
+            fileWriter.write("Total time taken to execute " + numberOfExecutions + " times : " + allExecutionTime / 1000
+                + "(seconds)");
             fileWriter.newLine();
         }
     }

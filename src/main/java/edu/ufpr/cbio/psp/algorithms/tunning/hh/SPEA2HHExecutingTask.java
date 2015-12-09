@@ -1,4 +1,4 @@
-package edu.ufpr.cbio.psp.algorithms.tuning;
+package edu.ufpr.cbio.psp.algorithms.tunning.hh;
 
 import java.io.File;
 import java.io.FileOutputStream;

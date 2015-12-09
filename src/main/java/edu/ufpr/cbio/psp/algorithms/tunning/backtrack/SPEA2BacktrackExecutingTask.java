@@ -1,4 +1,4 @@
-package edu.ufpr.cbio.psp.algorithms.tuning;
+package edu.ufpr.cbio.psp.algorithms.tunning.backtrack;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -7,19 +7,19 @@ import java.io.PrintStream;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.uma.jmetal.core.Algorithm;
 import org.uma.jmetal.core.SolutionSet;
-import org.uma.jmetal.metaheuristic.multiobjective.spea2.SPEA2;
 import org.uma.jmetal.operator.crossover.Crossover;
 import org.uma.jmetal.operator.mutation.Mutation;
 import org.uma.jmetal.operator.selection.BinaryTournament2;
 import org.uma.jmetal.operator.selection.Selection;
 import org.uma.jmetal.util.fileoutput.SolutionSetOutput;
 
+import edu.ufpr.cbio.psp.algorithms.backtrack.SPEA2BacktrackInitialization;
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
 import edu.ufpr.cbio.psp.problem.PSPProblem;
 
-public class SPEA2ExecutingTask implements Runnable {
+public class SPEA2BacktrackExecutingTask implements Runnable {
 
-    private static final String ALGORITHM_NAME = "SPEA2";
+    private static final String ALGORITHM_NAME = "SPEA2Backtrack";
 
     private PSPProblem problem;
     private Crossover crossover;
@@ -36,11 +36,12 @@ public class SPEA2ExecutingTask implements Runnable {
     private int configuration;
     private String configurationFileName;
     private int executions;
+    private double backtrackPercentage;
 
-    public SPEA2ExecutingTask(PSPProblem problem, Crossover crossover, double crossoverProbability,
+    public SPEA2BacktrackExecutingTask(PSPProblem problem, Crossover crossover, double crossoverProbability,
         String crossoverName, Mutation mutation, double mutationProbability, String mutationName, int population,
         int auxPopulation, int maxEvaluation, String proteinChain, String algorithmPath, int configuration,
-        String configurationFileName, int executions) {
+        String configurationFileName, int executions, double backtrackPercentage) {
 
         this.problem = problem;
         this.crossover = crossover;
@@ -57,18 +58,21 @@ public class SPEA2ExecutingTask implements Runnable {
         this.configuration = configuration;
         this.configurationFileName = configurationFileName;
         this.executions = executions;
+        this.backtrackPercentage = backtrackPercentage;
     }
 
     @Override
     public void run() {
 
-        SPEA2.Builder builder = new SPEA2.Builder(problem);
+        SPEA2BacktrackInitialization.Builder builder = new SPEA2BacktrackInitialization.Builder(problem);
 
         builder.setMutation(mutation);
         builder.setCrossover(crossover);
         builder.setArchiveSize(auxPopulation);
         builder.setPopulationSize(population);
         builder.setMaxEvaluations(maxEvaluation);
+        builder.setAminoAcidSequence(proteinChain);
+        builder.setBacktrackPercentage(backtrackPercentage);
 
         File configurationDir = createDir(algorithmPath + File.separator + "C" + configuration);
         File objectivesDir = createDir(configurationDir.getPath() + File.separator);
@@ -86,11 +90,12 @@ public class SPEA2ExecutingTask implements Runnable {
             executionOut.println("CrP: " + crossoverProbability);
             executionOut.println("Mutation: " + mutationName);
             executionOut.println("MtP: " + mutationProbability);
+            executionOut.println("Backtrack Percentage: " + backtrackPercentage);
             executionOut.println("Starting executions...");
 
             ConfigurationExecutionLogger.logConfiguration(ALGORITHM_NAME, population, auxPopulation, crossoverName,
                 crossoverProbability, mutationName, mutationProbability, maxEvaluation, proteinChain,
-                outputDir + File.separator + configurationFileName, 0);
+                outputDir + File.separator + configurationFileName, backtrackPercentage);
 
             for (int i = 0; i < executions; i++) {
                 executionOut.println("Execution: " + (i + 1));
@@ -144,7 +149,7 @@ public class SPEA2ExecutingTask implements Runnable {
                 algorithmPath + File.separator + "AllExecutions.log");
 
         }
-        SPEA2TuningMultiobjectiveMain.executedTasks++;
+        SPEA2BacktrackTuningMultiobjectiveMain.executedTasks++;
 
     }
 
