@@ -114,14 +114,14 @@ public class ConfigurationExecutionLogger {
     public static void logAllConfigurationHH(int configId, String algoritm, int population, Integer auxPopulation,
                                              String[] crosssover, double crossoverProbability, String[] mutation,
                                              double mutationProbability, int maxEvaluations, String fileName,
-                                             double alpha, double beta) throws IOException {
+                                             double alpha, double beta, double backtrackPercentage) throws IOException {
 
         File outputFile = new File(fileName);
 
         try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(outputFile, true))) {
 
             fileWriter.write("C" + configId + ": " + population + "," + auxPopulation + "," + maxEvaluations + ","
-                + alpha + "," + df.format(beta));
+                + alpha + "," + df.format(beta) + ",  bt=" + backtrackPercentage);
             fileWriter.newLine();
         }
     }

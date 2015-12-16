@@ -30,7 +30,7 @@ public class SPEA2HHTuningMultiobjectiveMain {
         String[] betas = null;
         int executions = 0;
         boolean logChoiceBehavior = false;
-        double backtrackPercentage = 0.0;
+        String[] backtrackPercentages = null;
         if (args.length == 16) {
             populations = args[0].split(",");
             maxEvaluations = args[1].split(",");
@@ -47,7 +47,7 @@ public class SPEA2HHTuningMultiobjectiveMain {
             llhComparator = args[12];
             proteinChain = args[13];
             logChoiceBehavior = Boolean.getBoolean(args[14]);
-            backtrackPercentage = Double.valueOf(args[15]);
+            backtrackPercentages = args[15].split(",");
 
         } else {
             populations = new String[] { "200" };
@@ -66,7 +66,7 @@ public class SPEA2HHTuningMultiobjectiveMain {
                 "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
             llhComparator = "ChoiceFunction";
             logChoiceBehavior = true;
-            backtrackPercentage = 20.0;
+            backtrackPercentages = new String[] { "20" };
         }
 
         ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
@@ -93,23 +93,29 @@ public class SPEA2HHTuningMultiobjectiveMain {
                         for (int h = 0; h < betas.length; h++) {
                             double beta = Double.valueOf(betas[h]);
 
-                            // Output files
-                            // All configurations log
-                            ConfigurationExecutionLogger.logAllConfigurationHH(configuration, ALGORITHM_NAME,
-                                Integer.valueOf(population),
-                                auxPopulation != null ? Integer.valueOf(auxPopulation) : null, crossovers,
-                                crossoverProbability, mutations, mutationProbability, Integer.valueOf(maxEvaluation),
-                                algorithmDir.getPath() + File.separator + allConfigurationsFileName, alpha, beta);
+                            for (int k = 0; k < backtrackPercentages.length; k++) {
+                                double backtrackPercentage = Double.valueOf(backtrackPercentages[k]);
+                                // Output files
+                                // All configurations log
+                                ConfigurationExecutionLogger.logAllConfigurationHH(configuration, ALGORITHM_NAME,
+                                    Integer.valueOf(population),
+                                    auxPopulation != null ? Integer.valueOf(auxPopulation) : null, crossovers,
+                                    crossoverProbability, mutations, mutationProbability,
+                                    Integer.valueOf(maxEvaluation),
+                                    algorithmDir.getPath() + File.separator + allConfigurationsFileName, alpha, beta,
+                                    backtrackPercentage);
 
-                            // Creating the task to execute the configuration
-                            SPEA2HHExecutingTask spea2ExecutionTask =
-                                new SPEA2HHExecutingTask(crossovers, Double.valueOf(crossoverProbability), mutations,
+                                // Creating the task to execute the
+                                // configuration
+                                SPEA2HHExecutingTask spea2ExecutionTask = new SPEA2HHExecutingTask(crossovers,
+                                    Double.valueOf(crossoverProbability), mutations,
                                     Double.valueOf(mutationProbability), population, auxPopulation, maxEvaluation,
                                     proteinChain, algorithmDir.getPath(), configuration, configurationFileName,
                                     executions, alpha, beta, llhComparator, logChoiceBehavior, backtrackPercentage);
 
-                            executor.execute(spea2ExecutionTask);
-                            configuration++;
+                                executor.execute(spea2ExecutionTask);
+                                configuration++;
+                            }
                         }
                     }
                 }

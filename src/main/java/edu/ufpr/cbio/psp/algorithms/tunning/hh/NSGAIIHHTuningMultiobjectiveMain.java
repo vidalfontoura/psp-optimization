@@ -29,7 +29,7 @@ public class NSGAIIHHTuningMultiobjectiveMain {
         String[] betas = null;
         int executions = 0;
         boolean logChoiceBehavior = false;
-        double backtrackPercentage = 0.0;
+        String[] backtrackPercentages = null;
         if (args.length == 15) {
             populations = args[0].split(",");
             maxEvaluations = args[1].split(",");
@@ -45,7 +45,7 @@ public class NSGAIIHHTuningMultiobjectiveMain {
             llhComparator = args[11];
             proteinChain = args[12];
             logChoiceBehavior = Boolean.getBoolean(args[13]);
-            backtrackPercentage = Double.valueOf(args[14]);
+            backtrackPercentages = args[14].split(",");
 
         } else {
             populations = new String[] { "200" };
@@ -63,7 +63,7 @@ public class NSGAIIHHTuningMultiobjectiveMain {
                 "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
             llhComparator = "Random";
             logChoiceBehavior = true;
-            backtrackPercentage = 20;
+            backtrackPercentages = new String[] { "20" };
         }
 
         ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
@@ -89,22 +89,27 @@ public class NSGAIIHHTuningMultiobjectiveMain {
                     for (int h = 0; h < betas.length; h++) {
                         double beta = Double.valueOf(betas[h]);
 
-                        // Output files
-                        // All configurations log
-                        ConfigurationExecutionLogger.logAllConfigurationHH(configuration, ALGORITHM_NAME,
-                            Integer.valueOf(population), null, crossovers, crossoverProbability, mutations,
-                            mutationProbability, Integer.valueOf(maxEvaluation),
-                            algorithmDir.getPath() + File.separator + allConfigurationsFileName, alpha, beta);
+                        for (int k = 0; k < backtrackPercentages.length; k++) {
 
-                        // Creating the task to execute the configuration
-                        NSGAIIExecutingTask nsgaIIExecutionTask =
-                            new NSGAIIExecutingTask(crossovers, Double.valueOf(crossoverProbability), mutations,
-                                Double.valueOf(mutationProbability), population, maxEvaluation, proteinChain,
-                                algorithmDir.getPath(), configuration, configurationFileName, executions, alpha, beta,
-                                llhComparator, logChoiceBehavior, backtrackPercentage);
+                            double backtrackPercentage = Double.valueOf(backtrackPercentages[k]);
+                            // Output files
+                            // All configurations log
+                            ConfigurationExecutionLogger.logAllConfigurationHH(configuration, ALGORITHM_NAME,
+                                Integer.valueOf(population), null, crossovers, crossoverProbability, mutations,
+                                mutationProbability, Integer.valueOf(maxEvaluation),
+                                algorithmDir.getPath() + File.separator + allConfigurationsFileName, alpha, beta,
+                                backtrackPercentage);
 
-                        executor.execute(nsgaIIExecutionTask);
-                        configuration++;
+                            // Creating the task to execute the configuration
+                            NSGAIIExecutingTask nsgaIIExecutionTask =
+                                new NSGAIIExecutingTask(crossovers, Double.valueOf(crossoverProbability), mutations,
+                                    Double.valueOf(mutationProbability), population, maxEvaluation, proteinChain,
+                                    algorithmDir.getPath(), configuration, configurationFileName, executions, alpha,
+                                    beta, llhComparator, logChoiceBehavior, backtrackPercentage);
+
+                            executor.execute(nsgaIIExecutionTask);
+                            configuration++;
+                        }
                     }
                 }
             }
