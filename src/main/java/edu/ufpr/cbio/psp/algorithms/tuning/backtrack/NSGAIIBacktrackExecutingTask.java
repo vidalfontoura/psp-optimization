@@ -69,18 +69,6 @@ public class NSGAIIBacktrackExecutingTask implements Runnable {
         try (PrintStream executionOut =
             new PrintStream(new FileOutputStream(configurationDir.getPath() + File.separator + "Execution.log"))) {
 
-            PSPProblem problem = new PSPProblem(proteinChain, 2, population, executionOut);
-
-            NSGAIIBacktrakInitializationTemplate.Builder builder =
-                new NSGAIIBacktrakInitializationTemplate.Builder(problem, evaluator);
-
-            builder.setMutation(mutation);
-            builder.setCrossover(crossover);
-            builder.setPopulationSize(population);
-            builder.setMaxEvaluations(maxEvaluation);
-            builder.setAminoAcidSequence(proteinChain);
-            builder.setBacktrackPercentage(backtrackPercentage);
-
             SolutionSet allRuns = new SolutionSet();
             long allExecutionTime = 0;
             executionOut.println("Algorithm configured with: ");
@@ -95,8 +83,20 @@ public class NSGAIIBacktrackExecutingTask implements Runnable {
             ConfigurationExecutionLogger.logConfiguration(ALGORITHM_NAME, population, 0, crossoverName,
                 crossoverProbability, mutationName, mutationProbability, maxEvaluation, proteinChain,
                 outputDir + File.separator + configurationFileName, 0);
-
+            PSPProblem problem = null;
             for (int i = 0; i < executions; i++) {
+
+                problem = new PSPProblem(proteinChain, 2, population, executionOut);
+
+                NSGAIIBacktrakInitializationTemplate.Builder builder =
+                    new NSGAIIBacktrakInitializationTemplate.Builder(problem, evaluator);
+
+                builder.setMutation(mutation);
+                builder.setCrossover(crossover);
+                builder.setPopulationSize(population);
+                builder.setMaxEvaluations(maxEvaluation);
+                builder.setAminoAcidSequence(proteinChain);
+                builder.setBacktrackPercentage(backtrackPercentage);
 
                 executionOut.println("Execution: " + (i + 1));
                 Selection selection = new BinaryTournament2.Builder().build();
