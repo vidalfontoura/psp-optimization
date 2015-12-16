@@ -22,15 +22,15 @@ public class PSPProblem extends org.uma.jmetal.core.Problem {
 
     private String proteinChain;
 
-    private double bestEnergyValuePerGen = 0.0;
-    private double bestEnergyValue = 0.0;
-    private String bestSolution = "";
-    private double distanceValuePerGen = 0.0;
-    private double distanceValue = 0.0;
+    private double bestEnergyValuePerGen;
+    private double bestEnergyValue;
+    private String bestSolution;
+    private double distanceValuePerGen;
+    private double distanceValue;
 
-    private int evaluationCount = 0;
+    private int evaluationCount;
 
-    private int generationsCount = 0;
+    private int generationsCount;
 
     private int populationSize;
 
@@ -54,6 +54,16 @@ public class PSPProblem extends org.uma.jmetal.core.Problem {
         solutionType = new IntSolutionType(this);
         this.populationSize = populationSize;
         this.executionStream = executionStream;
+
+        this.bestEnergyValuePerGen = Double.MAX_VALUE;
+        this.bestEnergyValue = Double.MAX_VALUE;
+        this.bestSolution = "";
+        this.distanceValuePerGen = 0.0;
+        this.distanceValue = 0.0;
+
+        this.evaluationCount = 0;
+
+        this.generationsCount = 0;
 
     }
 
@@ -89,7 +99,7 @@ public class PSPProblem extends org.uma.jmetal.core.Problem {
             solution.setObjective(0, topologicalContacts);
         }
 
-        if (topologicalContacts > bestEnergyValuePerGen) {
+        if (topologicalContacts < bestEnergyValuePerGen) {
 
             bestEnergyValuePerGen = topologicalContacts;
 
@@ -103,7 +113,7 @@ public class PSPProblem extends org.uma.jmetal.core.Problem {
             distanceValuePerGen = maxPointsDistance;
         }
 
-        if (topologicalContacts > bestEnergyValue) {
+        if (topologicalContacts < bestEnergyValue) {
             bestEnergyValue = topologicalContacts;
             distanceValue = maxPointsDistance;
         }
@@ -116,8 +126,8 @@ public class PSPProblem extends org.uma.jmetal.core.Problem {
             executionStream.println("Best fitness found so far: " + bestEnergyValue + "; distance: " + distanceValue);
 
             bestSolution = "";
-            bestEnergyValuePerGen = -1.1;
-            distanceValuePerGen = -1;
+            bestEnergyValuePerGen = 0.0;
+            distanceValuePerGen = 0;
             generationsCount++;
         }
 

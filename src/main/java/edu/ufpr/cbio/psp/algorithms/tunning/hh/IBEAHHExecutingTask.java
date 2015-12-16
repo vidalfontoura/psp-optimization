@@ -76,24 +76,11 @@ public class IBEAHHExecutingTask implements Runnable {
         try (PrintStream executionOut =
             new PrintStream(new FileOutputStream(configurationDir.getPath() + File.separator + "Execution.log"))) {
 
-            PSPProblem problem = new PSPProblem(proteinChain, 2, population, executionOut);
-            IBEAHyperHeuristic.Builder builder = new IBEAHyperHeuristic.Builder(problem);
-            builder.setArchiveSize(auxPopulation);
-            builder.setPopulationSize(population);
-            builder.setMaxEvaluations(maxEvaluation);
-            builder.setLLHComparator(llhComparator);
-            builder.setPercentageBacktrackPopulation(backtrackPercentage);
-            builder.setAminoAcidSequence(proteinChain);
-
             List<LowLevelHeuristic> lowLevelHeuristics = LowLevelHeuristic.Builder.generateLowLevelHeuristics(
                 crossovers, crossoverProbability, mutations, mutationProbability, alpha, beta);
-            builder.setLowLevelHeuristics(lowLevelHeuristics);
 
             ConfigurationExecutionLogger.logLowLevelHeuristics(lowLevelHeuristics, llhComparator,
                 configurationDir.getPath() + File.separator + "LowLevelInfo.txt");
-
-            Selection selection = new BinaryTournament2.Builder().build();
-            builder.setSelection(selection);
 
             SolutionSet allRuns = new SolutionSet();
             long allExecutionTime = 0;
@@ -115,9 +102,23 @@ public class IBEAHHExecutingTask implements Runnable {
                 mutations, crossoverProbability, mutationProbability, maxEvaluation, proteinChain,
                 outputDir + File.separator + configurationFileName);
 
+            PSPProblem problem = null;
             for (int i = 0; i < executions; i++) {
                 String executionDirectory = outputDir + "EXECUTION_" + i;
                 createDir(executionDirectory);
+
+                problem = new PSPProblem(proteinChain, 2, population, executionOut);
+                IBEAHyperHeuristic.Builder builder = new IBEAHyperHeuristic.Builder(problem);
+                builder.setArchiveSize(auxPopulation);
+                builder.setPopulationSize(population);
+                builder.setMaxEvaluations(maxEvaluation);
+                builder.setLLHComparator(llhComparator);
+                builder.setPercentageBacktrackPopulation(backtrackPercentage);
+                builder.setAminoAcidSequence(proteinChain);
+                builder.setLowLevelHeuristics(lowLevelHeuristics);
+
+                Selection selection = new BinaryTournament2.Builder().build();
+                builder.setSelection(selection);
 
                 if (!llhComparator.equals("Random") && logChoiceFunctionBehavior) {
                     builder.setChoiceFunctionLoggerFileName(executionDirectory + File.separator + "choiceBehavior.log");
