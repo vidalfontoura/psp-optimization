@@ -76,18 +76,6 @@ public class IBEABacktrackExecutingTask implements Runnable {
         try (PrintStream executionOut =
             new PrintStream(new FileOutputStream(configurationDir.getPath() + File.separator + "Execution.log"))) {
 
-            PSPProblem problem = new PSPProblem(proteinChain, 2, population, executionOut);
-
-            IBEABacktrackInitialization.Builder builder = new IBEABacktrackInitialization.Builder(problem);
-
-            builder.setMutation(mutation);
-            builder.setCrossover(crossover);
-            builder.setArchiveSize(auxPopulation);
-            builder.setPopulationSize(population);
-            builder.setMaxEvaluations(maxEvaluation);
-            builder.setAminoAcidSequence(proteinChain);
-            builder.setPercentageBacktrackPopulation(backtrackPercentage);
-
             SolutionSet allRuns = new SolutionSet();
             long allExecutionTime = 0;
             executionOut.println("Algorithm configured with: ");
@@ -104,7 +92,20 @@ public class IBEABacktrackExecutingTask implements Runnable {
                 crossoverProbability, mutationName, mutationProbability, maxEvaluation, proteinChain,
                 outputDir + File.separator + configurationFileName, backtrackPercentage);
 
+            PSPProblem problem = null;
             for (int i = 0; i < executions; i++) {
+
+                problem = new PSPProblem(proteinChain, 2, population, executionOut);
+
+                IBEABacktrackInitialization.Builder builder = new IBEABacktrackInitialization.Builder(problem);
+
+                builder.setMutation(mutation);
+                builder.setCrossover(crossover);
+                builder.setArchiveSize(auxPopulation);
+                builder.setPopulationSize(population);
+                builder.setMaxEvaluations(maxEvaluation);
+                builder.setAminoAcidSequence(proteinChain);
+                builder.setPercentageBacktrackPopulation(backtrackPercentage);
 
                 executionOut.println("Execution: " + (i + 1));
                 Selection selection = new BinaryTournament2.Builder().build();
