@@ -280,7 +280,7 @@ public class BacktrackInitialization {
 
         String aminoAcidSequence = "HHPPHHHPHHPHPHHHPPHHHPHHPHPH";
 
-        PSPProblem pspProblem = new PSPProblem(aminoAcidSequence, 2);
+        PSPProblem pspProblem = new PSPProblem(aminoAcidSequence, 2, 100, System.out);
         BacktrackInitialization backtrackInitialization = new BacktrackInitialization(pspProblem, aminoAcidSequence);
 
         SolutionSet population = backtrackInitialization.createPopulationAsIntegerSolution(1000);

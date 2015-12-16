@@ -38,11 +38,13 @@ public class IBEAPSPProblemRelativeMain {
         // "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
         String proteinChain = "PPPHHPPHHPPPPPHHHHHHHPPHHPPPPHHPPHPP";
         int numberOfObjectives = 2;
-        problem = new PSPProblem(proteinChain, numberOfObjectives);
+
+        int populationSize = 100;
+
+        problem = new PSPProblem(proteinChain, numberOfObjectives, populationSize, System.out);
 
         IBEA.Builder builder = new IBEA.Builder(problem);
 
-        int populationSize = 100;
         builder.setPopulationSize(populationSize);
 
         int maxEvaluations = 25000;

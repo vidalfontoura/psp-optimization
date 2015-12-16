@@ -72,6 +72,9 @@ public class NSGAIIHyperHeuristic extends NSGAIIHyperHeuristicTemplate implement
                     problem.evaluate(offSpring[0]);
                     problem.evaluateConstraints(offSpring[0]);
 
+                    problem.evaluate(offSpring[1]);
+                    problem.evaluateConstraints(offSpring[1]);
+
                     // Atualizar score da Low Level Heuristic aplicada
                     lowLevelHeuristic.updateScore(parents, offSpring);
 

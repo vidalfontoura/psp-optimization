@@ -21,7 +21,6 @@ public class SPEA2ExecutingTask implements Runnable {
 
     private static final String ALGORITHM_NAME = "SPEA2";
 
-    private PSPProblem problem;
     private Crossover crossover;
     private double crossoverProbability;
     private double mutationProbability;
@@ -37,12 +36,10 @@ public class SPEA2ExecutingTask implements Runnable {
     private String configurationFileName;
     private int executions;
 
-    public SPEA2ExecutingTask(PSPProblem problem, Crossover crossover, double crossoverProbability,
-        String crossoverName, Mutation mutation, double mutationProbability, String mutationName, int population,
-        int auxPopulation, int maxEvaluation, String proteinChain, String algorithmPath, int configuration,
-        String configurationFileName, int executions) {
+    public SPEA2ExecutingTask(Crossover crossover, double crossoverProbability, String crossoverName, Mutation mutation,
+        double mutationProbability, String mutationName, int population, int auxPopulation, int maxEvaluation,
+        String proteinChain, String algorithmPath, int configuration, String configurationFileName, int executions) {
 
-        this.problem = problem;
         this.crossover = crossover;
         this.mutation = mutation;
         this.population = population;
@@ -62,20 +59,22 @@ public class SPEA2ExecutingTask implements Runnable {
     @Override
     public void run() {
 
-        SPEA2.Builder builder = new SPEA2.Builder(problem);
-
-        builder.setMutation(mutation);
-        builder.setCrossover(crossover);
-        builder.setArchiveSize(auxPopulation);
-        builder.setPopulationSize(population);
-        builder.setMaxEvaluations(maxEvaluation);
-
         File configurationDir = createDir(algorithmPath + File.separator + "C" + configuration);
         File objectivesDir = createDir(configurationDir.getPath() + File.separator);
         String outputDir = objectivesDir.getPath() + File.separator;
 
         try (PrintStream executionOut =
             new PrintStream(new FileOutputStream(configurationDir.getPath() + File.separator + "Execution.log"))) {
+
+            PSPProblem problem = new PSPProblem(proteinChain, 2, population, System.out);
+
+            SPEA2.Builder builder = new SPEA2.Builder(problem);
+
+            builder.setMutation(mutation);
+            builder.setCrossover(crossover);
+            builder.setArchiveSize(auxPopulation);
+            builder.setPopulationSize(population);
+            builder.setMaxEvaluations(maxEvaluation);
 
             SolutionSet allRuns = new SolutionSet();
             long allExecutionTime = 0;

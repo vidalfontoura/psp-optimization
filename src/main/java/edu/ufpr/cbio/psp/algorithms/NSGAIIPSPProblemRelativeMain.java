@@ -8,7 +8,6 @@ import org.uma.jmetal.core.Operator;
 import org.uma.jmetal.core.SolutionSet;
 import org.uma.jmetal.metaheuristic.multiobjective.nsgaII.NSGAIITemplate;
 import org.uma.jmetal.operator.crossover.SinglePointCrossover;
-import org.uma.jmetal.operator.crossover.TwoPointsCrossover;
 import org.uma.jmetal.operator.mutation.BitFlipMutation;
 import org.uma.jmetal.operator.selection.BinaryTournament2;
 import org.uma.jmetal.util.evaluator.SequentialSolutionSetEvaluator;
@@ -40,13 +39,13 @@ public class NSGAIIPSPProblemRelativeMain {
 
         String proteinChain =
             "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
+        int populationSize = 100;
         int numberOfObjectives = 2;
-        problem = new PSPProblem(proteinChain, numberOfObjectives);
+        problem = new PSPProblem(proteinChain, numberOfObjectives, populationSize, System.out);
 
         SolutionSetEvaluator evaluator = new SequentialSolutionSetEvaluator();
         NSGAIITemplate.Builder builder = new NSGAIITemplate.Builder(problem, evaluator);
 
-        int populationSize = 100;
         builder.setPopulationSize(populationSize);
 
         int maxEvaluations = 25000;

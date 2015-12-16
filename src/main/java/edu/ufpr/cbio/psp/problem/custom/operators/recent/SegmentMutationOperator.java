@@ -65,7 +65,7 @@ public class SegmentMutationOperator extends Mutation {
                 int oldDirection = (int) vars.getValue(i);
                 int newDirection = oldDirection;
                 do {
-                    newDirection = PseudoRandom.randInt(0, 4);
+                    newDirection = PseudoRandom.randInt(0, 2);
                 } while (oldDirection == newDirection);
 
                 vars.setValue(i, newDirection);
@@ -74,6 +74,13 @@ public class SegmentMutationOperator extends Mutation {
         }
         return offspring;
 
+    }
+
+    public static void main(String[] args) {
+
+        while (true) {
+            System.out.println(PseudoRandom.randInt(0, 2));
+        }
     }
 
 }

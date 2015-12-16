@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
-import edu.ufpr.cbio.psp.problem.PSPProblem;
 import edu.ufpr.cbio.psp.problem.utils.ProteinChainUtils;
 
 public class NSGAIIHHTuningMultiobjectiveMain {
@@ -62,7 +61,7 @@ public class NSGAIIHHTuningMultiobjectiveMain {
             betas = new String[] { "0.00005", };
             proteinChain =
                 "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
-            llhComparator = "ChoiceFunction";
+            llhComparator = "Random";
             logChoiceBehavior = true;
             backtrackPercentage = 20;
         }
@@ -73,8 +72,6 @@ public class NSGAIIHHTuningMultiobjectiveMain {
         String configurationFileName = "Configuration.txt";
         String executionLog = "AllExecutions.log";
         String allConfigurationsFileName = "AllConfigurations.txt";
-
-        PSPProblem problem = new PSPProblem(proteinChain, numberOfObjectives);
 
         int configuration = 0;
         File rootDir = createDir(resultsPath);
@@ -101,8 +98,8 @@ public class NSGAIIHHTuningMultiobjectiveMain {
 
                         // Creating the task to execute the configuration
                         NSGAIIExecutingTask nsgaIIExecutionTask =
-                            new NSGAIIExecutingTask(problem, crossovers, Double.valueOf(crossoverProbability),
-                                mutations, Double.valueOf(mutationProbability), population, maxEvaluation, proteinChain,
+                            new NSGAIIExecutingTask(crossovers, Double.valueOf(crossoverProbability), mutations,
+                                Double.valueOf(mutationProbability), population, maxEvaluation, proteinChain,
                                 algorithmDir.getPath(), configuration, configurationFileName, executions, alpha, beta,
                                 llhComparator, logChoiceBehavior, backtrackPercentage);
 

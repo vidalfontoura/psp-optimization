@@ -51,7 +51,7 @@ public class SPEA2HyperHeuristicPSPMain {
         File objectivesDir = createDir(algorithmDir.getPath() + File.separator);
         String outputDir = objectivesDir.getPath() + File.separator;
 
-        PSPProblem problem = new PSPProblem(proteinChain, numberOfObjectives);
+        PSPProblem problem = new PSPProblem(proteinChain, numberOfObjectives, populationSize, System.out);
         SPEA2HyperHeuristic.Builder builder = new SPEA2HyperHeuristic.Builder(problem);
 
         builder.setPopulationSize(populationSize);
@@ -85,8 +85,8 @@ public class SPEA2HyperHeuristicPSPMain {
             String executionDirectory = outputDir + "EXECUTION_" + i;
             createDir(executionDirectory);
 
-            builder.setLowLevelHeuristics(LowLevelHeuristic.Builder.generateLowLevelHeuristics(listCrossover,
-                listMutation, alpha, beta));
+            builder.setLowLevelHeuristics(
+                LowLevelHeuristic.Builder.generateLowLevelHeuristics(listCrossover, listMutation, alpha, beta));
 
             builder.setChoiceFunctionLoggerFileName(executionDirectory + File.separator + choiceFunctionFileName);
             Algorithm algorithm = builder.build();

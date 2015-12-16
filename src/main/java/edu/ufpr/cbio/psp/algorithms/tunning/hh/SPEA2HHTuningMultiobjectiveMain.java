@@ -5,12 +5,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
-import edu.ufpr.cbio.psp.problem.PSPProblem;
 import edu.ufpr.cbio.psp.problem.utils.ProteinChainUtils;
 
 public class SPEA2HHTuningMultiobjectiveMain {
 
-    private static final String ALGORITHM_NAME = "SPEA2";
+    private static final String ALGORITHM_NAME = "SPEA2HH";
     public static int executedTasks = 0;
 
     public static void main(String[] args) throws Exception {
@@ -31,7 +30,8 @@ public class SPEA2HHTuningMultiobjectiveMain {
         String[] betas = null;
         int executions = 0;
         boolean logChoiceBehavior = false;
-        if (args.length == 15) {
+        double backtrackPercentage = 0.0;
+        if (args.length == 16) {
             populations = args[0].split(",");
             maxEvaluations = args[1].split(",");
             crossovers = args[2].split(",");
@@ -47,6 +47,7 @@ public class SPEA2HHTuningMultiobjectiveMain {
             llhComparator = args[12];
             proteinChain = args[13];
             logChoiceBehavior = Boolean.getBoolean(args[14]);
+            backtrackPercentage = Double.valueOf(args[15]);
 
         } else {
             populations = new String[] { "200" };
@@ -65,16 +66,14 @@ public class SPEA2HHTuningMultiobjectiveMain {
                 "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
             llhComparator = "ChoiceFunction";
             logChoiceBehavior = true;
+            backtrackPercentage = 20.0;
         }
 
         ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
-        int numberOfObjectives = 2;
 
         String configurationFileName = "Configuration.txt";
         String executionLog = "AllExecutions.log";
         String allConfigurationsFileName = "AllConfigurations.txt";
-
-        PSPProblem problem = new PSPProblem(proteinChain, numberOfObjectives);
 
         int configuration = 0;
         File rootDir = createDir(resultsPath);
@@ -96,18 +95,18 @@ public class SPEA2HHTuningMultiobjectiveMain {
 
                             // Output files
                             // All configurations log
-                            ConfigurationExecutionLogger.logAllConfigurationHH(configuration, ALGORITHM_NAME, Integer
-                                .valueOf(population), auxPopulation != null ? Integer.valueOf(auxPopulation) : null,
-                                crossovers, crossoverProbability, mutations, mutationProbability, Integer
-                                    .valueOf(maxEvaluation), algorithmDir.getPath() + File.separator
-                                    + allConfigurationsFileName, alpha, beta);
+                            ConfigurationExecutionLogger.logAllConfigurationHH(configuration, ALGORITHM_NAME,
+                                Integer.valueOf(population),
+                                auxPopulation != null ? Integer.valueOf(auxPopulation) : null, crossovers,
+                                crossoverProbability, mutations, mutationProbability, Integer.valueOf(maxEvaluation),
+                                algorithmDir.getPath() + File.separator + allConfigurationsFileName, alpha, beta);
 
                             // Creating the task to execute the configuration
                             SPEA2HHExecutingTask spea2ExecutionTask =
-                                new SPEA2HHExecutingTask(problem, crossovers, Double.valueOf(crossoverProbability),
-                                    mutations, Double.valueOf(mutationProbability), population, auxPopulation,
-                                    maxEvaluation, proteinChain, algorithmDir.getPath(), configuration,
-                                    configurationFileName, executions, alpha, beta, llhComparator, logChoiceBehavior);
+                                new SPEA2HHExecutingTask(crossovers, Double.valueOf(crossoverProbability), mutations,
+                                    Double.valueOf(mutationProbability), population, auxPopulation, maxEvaluation,
+                                    proteinChain, algorithmDir.getPath(), configuration, configurationFileName,
+                                    executions, alpha, beta, llhComparator, logChoiceBehavior, backtrackPercentage);
 
                             executor.execute(spea2ExecutionTask);
                             configuration++;
@@ -118,14 +117,15 @@ public class SPEA2HHTuningMultiobjectiveMain {
         }
 
         while (executedTasks < configuration) {
-            ConfigurationExecutionLogger.logMessage("Total tasks config " + configuration + " executed "
-                + executedTasks, algorithmDir + File.separator + executionLog);
+            ConfigurationExecutionLogger.logMessage(
+                "Total tasks config " + configuration + " executed " + executedTasks,
+                algorithmDir + File.separator + executionLog);
             System.out.println("Total tasks config " + configuration + " executed " + executedTasks);
             Thread.sleep(30000);
 
         }
-        ConfigurationExecutionLogger.logMessage("End of " + configuration + "configurations executions ", algorithmDir
-            + File.separator + executionLog);
+        ConfigurationExecutionLogger.logMessage("End of " + configuration + "configurations executions ",
+            algorithmDir + File.separator + executionLog);
         System.out.println("End of " + configuration + " configurations executions ");
         System.exit(0);
 

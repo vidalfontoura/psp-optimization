@@ -20,6 +20,7 @@ import org.uma.jmetal.util.comparator.DominanceComparator;
 import org.uma.jmetal.util.comparator.FitnessComparator;
 import org.uma.jmetal.util.random.PseudoRandom;
 
+import edu.ufpr.cbio.psp.algorithms.backtrack.initialization.BacktrackInitialization;
 import edu.ufpr.cbio.psp.algorithms.hyperheuristc.comparators.LowLevelHeuristicComparatorFactory;
 import edu.ufpr.cbio.psp.algorithms.hyperheuristic.loggers.ChoiceFunctionLogger;
 import edu.ufpr.cbio.psp.algorithms.hyperheuristic.lowlevelheuristic.LowLevelHeuristic;
@@ -44,6 +45,10 @@ public class IBEAHyperHeuristic implements Algorithm {
 
     private Selection selection;
 
+    private double percentageBacktrackPopulation;
+
+    private BacktrackInitialization backtrack;
+
     /** Constructor */
     private IBEAHyperHeuristic(Builder builder) {
 
@@ -55,6 +60,8 @@ public class IBEAHyperHeuristic implements Algorithm {
         this.selection = builder.selection;
         this.choiceFunctionLoggerFileName = builder.choiceFunctionLoggerFileName;
         this.llhComparator = builder.llhComparator;
+        this.backtrack = new BacktrackInitialization(problem, builder.aminoAcidSequence);
+        this.percentageBacktrackPopulation = builder.percentageBacktrackPopulation;
     }
 
     /* Getters */
@@ -87,8 +94,8 @@ public class IBEAHyperHeuristic implements Algorithm {
      * calculates the hypervolume of that portion of the objective space that is
      * dominated by individual a but not by individual b
      */
-    double calculateHypervolumeIndicator(Solution solutionA, Solution solutionB, int d, double maximumValues[],
-                                         double minimumValues[]) {
+        double calculateHypervolumeIndicator(Solution solutionA, Solution solutionB, int d, double maximumValues[],
+                                             double minimumValues[]) {
 
         double a, b, r, max;
         double volume = 0;
@@ -114,13 +121,11 @@ public class IBEAHyperHeuristic implements Algorithm {
             if (a < b) {
                 volume =
                     calculateHypervolumeIndicator(solutionA, null, d - 1, maximumValues, minimumValues) * (b - a) / r;
-                volume +=
-                    calculateHypervolumeIndicator(solutionA, solutionB, d - 1, maximumValues, minimumValues)
-                        * (max - b) / r;
+                volume += calculateHypervolumeIndicator(solutionA, solutionB, d - 1, maximumValues, minimumValues)
+                    * (max - b) / r;
             } else {
-                volume =
-                    calculateHypervolumeIndicator(solutionA, solutionB, d - 1, maximumValues, minimumValues)
-                        * (max - a) / r;
+                volume = calculateHypervolumeIndicator(solutionA, solutionB, d - 1, maximumValues, minimumValues)
+                    * (max - a) / r;
             }
         }
 
@@ -151,13 +156,11 @@ public class IBEAHyperHeuristic implements Algorithm {
 
                 double value = 0.0;
                 if (flag == -1) {
-                    value =
-                        -calculateHypervolumeIndicator(A.get(0), B.get(0), problem.getNumberOfObjectives(),
-                            maximumValues, minimumValues);
+                    value = -calculateHypervolumeIndicator(A.get(0), B.get(0), problem.getNumberOfObjectives(),
+                        maximumValues, minimumValues);
                 } else {
-                    value =
-                        calculateHypervolumeIndicator(B.get(0), A.get(0), problem.getNumberOfObjectives(),
-                            maximumValues, minimumValues);
+                    value = calculateHypervolumeIndicator(B.get(0), A.get(0), problem.getNumberOfObjectives(),
+                        maximumValues, minimumValues);
                 }
 
                 // Update the max value of the indicator
@@ -275,14 +278,24 @@ public class IBEAHyperHeuristic implements Algorithm {
             heuristicFunctionComparator = null;
         }
 
+        int amountOfSolutionsBacktrack = 0;
+        SolutionSet backtrackSolutions = null;
+        if (percentageBacktrackPopulation > 0) {
+            amountOfSolutionsBacktrack = (int) (populationSize * percentageBacktrackPopulation) / 100;
+            backtrackSolutions = backtrack.createPopulationAsIntegerSolution(amountOfSolutionsBacktrack);
+        }
+
         // -> Create the initial solutionSet
         Solution newSolution;
-        for (int i = 0; i < populationSize; i++) {
+        for (int i = amountOfSolutionsBacktrack; i < populationSize; i++) {
             newSolution = new Solution(problem);
             problem.evaluate(newSolution);
             problem.evaluateConstraints(newSolution);
             evaluations++;
             solutionSet.add(newSolution);
+        }
+        if (backtrackSolutions != null) {
+            solutionSet = solutionSet.union(backtrackSolutions);
         }
 
         while (evaluations < maxEvaluations) {
@@ -330,8 +343,8 @@ public class IBEAHyperHeuristic implements Algorithm {
                 lowLevelHeuristic.updateScore(parents, offSpring);
 
                 if (choiceFunctionLoggerFileName != null) {
-                    ChoiceFunctionLogger
-                        .logSelectedHyperHeuristicScore(lowLevelHeuristic, choiceFunctionLoggerFileName);
+                    ChoiceFunctionLogger.logSelectedHyperHeuristicScore(lowLevelHeuristic,
+                        choiceFunctionLoggerFileName);
                 }
 
                 // Atualiza score das Low Level Heuristics n�o utilizadas
@@ -364,6 +377,8 @@ public class IBEAHyperHeuristic implements Algorithm {
 
         private String choiceFunctionLoggerFileName;
         private String llhComparator;
+        private String aminoAcidSequence;
+        private double percentageBacktrackPopulation;
 
         public Builder(Problem problem) {
 
@@ -429,6 +444,20 @@ public class IBEAHyperHeuristic implements Algorithm {
             return this;
         }
 
+        public Builder setAminoAcidSequence(String sequence) {
+
+            this.aminoAcidSequence = sequence;
+
+            return this;
+        }
+
+        public Builder setPercentageBacktrackPopulation(double value) {
+
+            this.percentageBacktrackPopulation = value;
+
+            return this;
+        }
+
         public IBEAHyperHeuristic build() {
 
             return new IBEAHyperHeuristic(this);
@@ -454,10 +483,9 @@ public class IBEAHyperHeuristic implements Algorithm {
 
             return applyingHeuristics.get(PseudoRandom.randInt(0, applyingHeuristics.size() - 1));
             // }
-        } else {
-            // Random
-            return lowLevelHeuristics.get(PseudoRandom.randInt(0, lowLevelHeuristics.size() - 1));
         }
+        // Random
+        return lowLevelHeuristics.get(PseudoRandom.randInt(0, lowLevelHeuristics.size() - 1));
     }
 
     public void clearLowLevelHeuristics() {

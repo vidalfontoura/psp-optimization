@@ -17,6 +17,7 @@ import org.uma.jmetal.util.JMetalException;
 import org.uma.jmetal.util.Ranking;
 import org.uma.jmetal.util.random.PseudoRandom;
 
+import edu.ufpr.cbio.psp.algorithms.backtrack.initialization.BacktrackInitialization;
 import edu.ufpr.cbio.psp.algorithms.hyperheuristc.comparators.LowLevelHeuristicComparatorFactory;
 import edu.ufpr.cbio.psp.algorithms.hyperheuristic.loggers.ChoiceFunctionLogger;
 import edu.ufpr.cbio.psp.algorithms.hyperheuristic.lowlevelheuristic.LowLevelHeuristic;
@@ -36,6 +37,9 @@ public class SPEA2HyperHeuristic implements Algorithm {
     private String choiceFunctionLoggerFileName;
     private String llhComparator;
 
+    private double backtrackPercentage;
+    private BacktrackInitialization backtrack;
+
     /** Constructor */
     private SPEA2HyperHeuristic(Builder builder) {
 
@@ -48,6 +52,9 @@ public class SPEA2HyperHeuristic implements Algorithm {
         this.lowLevelHeuristics = builder.lowLevelHeuristics;
         this.choiceFunctionLoggerFileName = builder.choiceFunctionLoggerFileName;
         this.llhComparator = builder.llhComparator;
+        this.backtrackPercentage = builder.backtrackPercentage;
+        this.backtrack = new BacktrackInitialization(problem, builder.aminoAcidSequence);
+
     }
 
     /* Getters */
@@ -98,6 +105,9 @@ public class SPEA2HyperHeuristic implements Algorithm {
 
         private String choiceFunctionLoggerFileName;
         private String llhComparator;
+        private double backtrackPercentage;
+
+        private String aminoAcidSequence;
 
         public Builder(Problem problem) {
 
@@ -107,6 +117,7 @@ public class SPEA2HyperHeuristic implements Algorithm {
             this.maxEvaluations = 25000;
             this.choiceFunctionLoggerFileName = null;
             this.llhComparator = null;
+
         }
 
         public Builder setPopulationSize(int populationSize) {
@@ -157,6 +168,18 @@ public class SPEA2HyperHeuristic implements Algorithm {
             return this;
         }
 
+        public Builder setBacktrackPercentage(double backtrackPercentage) {
+
+            this.backtrackPercentage = backtrackPercentage;
+            return this;
+        }
+
+        public Builder setAminoAcidSequence(String aminoAcidSequence) {
+
+            this.aminoAcidSequence = aminoAcidSequence;
+            return this;
+        }
+
         public SPEA2HyperHeuristic build() {
 
             return new SPEA2HyperHeuristic(this);
@@ -187,14 +210,24 @@ public class SPEA2HyperHeuristic implements Algorithm {
             heuristicFunctionComparator = null;
         }
 
+        int amountOfSolutionsBacktrack = 0;
+        SolutionSet backtrackSolutions = null;
+        if (backtrackPercentage > 0) {
+            amountOfSolutionsBacktrack = (int) (populationSize * backtrackPercentage) / 100;
+            backtrackSolutions = backtrack.createPopulationAsIntegerSolution(amountOfSolutionsBacktrack);
+        }
+
         // -> Create the initial solutionSet
         Solution newSolution;
-        for (int i = 0; i < populationSize; i++) {
+        for (int i = amountOfSolutionsBacktrack; i < populationSize; i++) {
             newSolution = new Solution(problem);
             problem.evaluate(newSolution);
             problem.evaluateConstraints(newSolution);
             evaluations++;
             solutionSet.add(newSolution);
+        }
+        if (backtrackSolutions != null) {
+            solutionSet = solutionSet.union(backtrackSolutions);
         }
 
         while (evaluations < maxEvaluations) {
@@ -220,9 +253,6 @@ public class SPEA2HyperHeuristic implements Algorithm {
                 if (choiceFunctionLoggerFileName != null) {
                     ChoiceFunctionLogger.logHyperHeuristics(lowLevelHeuristics, choiceFunctionLoggerFileName);
                 }
-                // TODO Editar para hyper heuristica
-                // LowLevelHeuristic lowLevelHeuristic =
-                // lowLevelHeuristics.get(0);
 
                 LowLevelHeuristic lowLevelHeuristic = getApplyingHeuristic(heuristicFunctionComparator);
                 if (choiceFunctionLoggerFileName != null) {
@@ -231,10 +261,7 @@ public class SPEA2HyperHeuristic implements Algorithm {
 
                 Solution[] offSpring = (Solution[]) lowLevelHeuristic.execute(parents);
                 offSpring = new Solution[] { offSpring[0] };
-                // make the crossover
-                // Solution[] offSpring = (Solution[])
-                // crossoverOperator.execute(parents);
-                // mutationOperator.execute(offSpring[0]);
+
                 problem.evaluate(offSpring[0]);
                 problem.evaluateConstraints(offSpring[0]);
                 offSpringSolutionSet.add(offSpring[0]);
@@ -243,8 +270,8 @@ public class SPEA2HyperHeuristic implements Algorithm {
                 lowLevelHeuristic.updateScore(parents, offSpring);
 
                 if (choiceFunctionLoggerFileName != null) {
-                    ChoiceFunctionLogger
-                        .logSelectedHyperHeuristicScore(lowLevelHeuristic, choiceFunctionLoggerFileName);
+                    ChoiceFunctionLogger.logSelectedHyperHeuristicScore(lowLevelHeuristic,
+                        choiceFunctionLoggerFileName);
                 }
 
                 // Atualiza score das Low Level Heuristics n�o utilizadas
@@ -266,12 +293,6 @@ public class SPEA2HyperHeuristic implements Algorithm {
 
     private LowLevelHeuristic getApplyingHeuristic(Comparator<LowLevelHeuristic> comparator) {
 
-        // if
-        // (getInputParameter("heuristicFunction").equals(LowLevelHeuristic.RANDOM)
-        // || comparator == null) {
-        // return lowLevelHeuristics.get(PseudoRandom.randInt(0,
-        // lowLevelHeuristics.size() - 1));
-        // } else {
         if (comparator != null) {
             // Choice
             List<LowLevelHeuristic> allLowLevelHeuristics = new ArrayList<>(lowLevelHeuristics);
@@ -289,9 +310,8 @@ public class SPEA2HyperHeuristic implements Algorithm {
 
             return applyingHeuristics.get(PseudoRandom.randInt(0, applyingHeuristics.size() - 1));
             // }
-        } else {
-            // Random
-            return lowLevelHeuristics.get(PseudoRandom.randInt(0, lowLevelHeuristics.size() - 1));
         }
+        // Random
+        return lowLevelHeuristics.get(PseudoRandom.randInt(0, lowLevelHeuristics.size() - 1));
     }
 }

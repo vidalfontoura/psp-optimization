@@ -18,9 +18,8 @@ import edu.ufpr.cbio.psp.problem.PSPProblem;
 
 public class SPEA2HHExecutingTask implements Runnable {
 
-    private static final String ALGORITHM_NAME = "SPEA2";
+    private static final String ALGORITHM_NAME = "SPEA2HH";
 
-    private PSPProblem problem;
     private double crossoverProbability;
     private double mutationProbability;
     private int population;
@@ -40,13 +39,13 @@ public class SPEA2HHExecutingTask implements Runnable {
 
     private String llhComparator;
     private boolean logChoiceFunctionBehavior;
+    private double backtrackPercentage;
 
-    public SPEA2HHExecutingTask(PSPProblem problem, String[] crossovers, double crossoverProbability,
-        String[] mutations, double mutationProbability, int population, int auxPopulation, int maxEvaluation,
-        String proteinChain, String algorithmPath, int configuration, String configurationFileName, int executions,
-        double alpha, double beta, String llhComparator, boolean logChoiceFunctionBehavior) {
+    public SPEA2HHExecutingTask(String[] crossovers, double crossoverProbability, String[] mutations,
+        double mutationProbability, int population, int auxPopulation, int maxEvaluation, String proteinChain,
+        String algorithmPath, int configuration, String configurationFileName, int executions, double alpha,
+        double beta, String llhComparator, boolean logChoiceFunctionBehavior, double backtrackPercentage) {
 
-        this.problem = problem;
         this.population = population;
         this.auxPopulation = auxPopulation;
         this.maxEvaluation = maxEvaluation;
@@ -63,6 +62,7 @@ public class SPEA2HHExecutingTask implements Runnable {
         this.beta = beta;
         this.llhComparator = llhComparator;
         this.logChoiceFunctionBehavior = logChoiceFunctionBehavior;
+        this.backtrackPercentage = backtrackPercentage;
     }
 
     @Override
@@ -72,18 +72,20 @@ public class SPEA2HHExecutingTask implements Runnable {
         File objectivesDir = createDir(configurationDir.getPath() + File.separator);
         String outputDir = objectivesDir.getPath() + File.separator;
 
-        try (
-            PrintStream executionOut =
-                new PrintStream(new FileOutputStream(configurationDir.getPath() + File.separator + "Execution.log"))) {
+        try (PrintStream executionOut =
+            new PrintStream(new FileOutputStream(configurationDir.getPath() + File.separator + "Execution.log"))) {
+
+            PSPProblem problem = new PSPProblem(proteinChain, 2, population, executionOut);
             SPEA2HyperHeuristic.Builder builder = new SPEA2HyperHeuristic.Builder(problem);
             builder.setArchiveSize(auxPopulation);
             builder.setPopulationSize(population);
             builder.setMaxEvaluations(maxEvaluation);
             builder.setLLHComparator(llhComparator);
+            builder.setBacktrackPercentage(backtrackPercentage);
+            builder.setAminoAcidSequence(proteinChain);
 
-            List<LowLevelHeuristic> lowLevelHeuristics =
-                LowLevelHeuristic.Builder.generateLowLevelHeuristics(crossovers, crossoverProbability, mutations,
-                    mutationProbability, alpha, beta);
+            List<LowLevelHeuristic> lowLevelHeuristics = LowLevelHeuristic.Builder.generateLowLevelHeuristics(
+                crossovers, crossoverProbability, mutations, mutationProbability, alpha, beta);
             builder.setLowLevelHeuristics(lowLevelHeuristics);
 
             ConfigurationExecutionLogger.logLowLevelHeuristics(lowLevelHeuristics, llhComparator,
@@ -109,8 +111,8 @@ public class SPEA2HHExecutingTask implements Runnable {
             }
 
             ConfigurationExecutionLogger.logConfigurationHH(ALGORITHM_NAME, population, auxPopulation, crossovers,
-                mutations, crossoverProbability, mutationProbability, maxEvaluation, proteinChain, outputDir
-                    + File.separator + configurationFileName);
+                mutations, crossoverProbability, mutationProbability, maxEvaluation, proteinChain,
+                outputDir + File.separator + configurationFileName);
 
             for (int i = 0; i < executions; i++) {
                 String executionDirectory = outputDir + "EXECUTION_" + i;
@@ -133,10 +135,10 @@ public class SPEA2HHExecutingTask implements Runnable {
                 problem.removeDominateds(nonDominatedPopulation);
                 problem.removeDuplicates(nonDominatedPopulation);
 
-                SolutionSetOutput.printVariablesToFile(nonDominatedPopulation, executionDirectory + File.separator
-                    + "VAR.txt");
-                SolutionSetOutput.printObjectivesToFile(nonDominatedPopulation, executionDirectory + File.separator
-                    + "FUN.txt");
+                SolutionSetOutput.printVariablesToFile(nonDominatedPopulation,
+                    executionDirectory + File.separator + "VAR.txt");
+                SolutionSetOutput.printObjectivesToFile(nonDominatedPopulation,
+                    executionDirectory + File.separator + "FUN.txt");
 
                 ConfigurationExecutionLogger.logLowLevelHeuristics(lowLevelHeuristics, llhComparator,
                     executionDirectory + File.separator + "LLH.txt");
@@ -148,8 +150,8 @@ public class SPEA2HHExecutingTask implements Runnable {
             executionOut.println("End of execution for problem " + problem.getClass().getName() + ".");
             executionOut.println("Total time (seconds): " + allExecutionTime / 1000);
             executionOut.println("Writing results.");
-            ConfigurationExecutionLogger.logEndOfExecution(executions, allExecutionTime, outputDir + File.separator
-                + configurationFileName);
+            ConfigurationExecutionLogger.logEndOfExecution(executions, allExecutionTime,
+                outputDir + File.separator + configurationFileName);
 
             problem.removeDominateds(allRuns);
             problem.removeDuplicates(allRuns);
@@ -161,13 +163,13 @@ public class SPEA2HHExecutingTask implements Runnable {
 
             ConfigurationExecutionLogger.logMessage("ERROR: Occured while executing C" + this.configuration + ":",
                 configurationDir.getPath() + File.separator + "error.log");
-            ConfigurationExecutionLogger.logMessage(ExceptionUtils.getStackTrace(e), configurationDir.getPath()
-                + File.separator + "Error.log");
+            ConfigurationExecutionLogger.logMessage(ExceptionUtils.getStackTrace(e),
+                configurationDir.getPath() + File.separator + "Error.log");
 
             ConfigurationExecutionLogger.logMessage("ERROR: occured while executing C" + this.configuration + ":",
                 algorithmPath + File.separator + "executions.log");
-            ConfigurationExecutionLogger.logMessage(ExceptionUtils.getStackTrace(e), algorithmPath + File.separator
-                + "AllExecutions.log");
+            ConfigurationExecutionLogger.logMessage(ExceptionUtils.getStackTrace(e),
+                algorithmPath + File.separator + "AllExecutions.log");
 
         }
         SPEA2HHTuningMultiobjectiveMain.executedTasks++;

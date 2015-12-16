@@ -30,7 +30,7 @@ public class RandomSearchPSPProblemRelativeMain {
         String proteinChain =
             "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
         int numberOfObjectives = 2;
-        problem = new PSPProblem(proteinChain, numberOfObjectives);
+        problem = new PSPProblem(proteinChain, numberOfObjectives, 100, System.out);
 
         RandomSearch.Builder builder = new RandomSearch.Builder(problem);
 

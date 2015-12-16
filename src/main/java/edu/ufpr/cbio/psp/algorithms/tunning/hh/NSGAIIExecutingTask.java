@@ -43,12 +43,11 @@ public class NSGAIIExecutingTask implements Runnable {
 
     private double backtrackPercentage;
 
-    public NSGAIIExecutingTask(PSPProblem problem, String[] crossovers, double crossoverProbability, String[] mutations,
+    public NSGAIIExecutingTask(String[] crossovers, double crossoverProbability, String[] mutations,
         double mutationProbability, int population, int maxEvaluation, String proteinChain, String algorithmPath,
         int configuration, String configurationFileName, int executions, double alpha, double beta,
         String llhComparator, boolean logChoiceFunctionBehavior, double backtrackPercentage) {
 
-        this.problem = problem;
         this.population = population;
         this.maxEvaluation = maxEvaluation;
         this.proteinChain = proteinChain;
@@ -77,6 +76,9 @@ public class NSGAIIExecutingTask implements Runnable {
         try (PrintStream executionOut =
             new PrintStream(new FileOutputStream(configurationDir.getPath() + File.separator + "Execution.log"))) {
             SequentialSolutionSetEvaluator sequentialSolutionSetEvaluator = new SequentialSolutionSetEvaluator();
+
+            PSPProblem problem = new PSPProblem(proteinChain, 2, population, executionOut);
+
             NSGAIIHyperHeuristic.Builder builder =
                 new NSGAIIHyperHeuristic.Builder(problem, sequentialSolutionSetEvaluator);
             builder.setPopulationSize(population);
