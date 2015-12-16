@@ -45,11 +45,12 @@ public class SingleObjetivePSPProblemRelativaMain {
         String proteinChain =
             "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
         int numberOfObjectives = 1;
-        problem = new PSPProblem(proteinChain, numberOfObjectives);
+
+        int populationSize = 100;
+        problem = new PSPProblem(proteinChain, numberOfObjectives, populationSize, System.out);
 
         Builder builder = new GenerationalGeneticAlgorithm.Builder(problem);
 
-        int populationSize = 100;
         builder.setPopulationSize(populationSize);
 
         int maxEvaluations = 25000;
@@ -68,14 +69,12 @@ public class SingleObjetivePSPProblemRelativaMain {
 
         evaluator = new SequentialSolutionSetEvaluator();
 
-        algorithm =
-            builder.setPopulationSize(populationSize).setMaxEvaluations(maxEvaluations).setCrossover(crossover)
-                .setMutation(mutation).setSelection(selection).setEvaluator(evaluator).build();
+        algorithm = builder.setPopulationSize(populationSize).setMaxEvaluations(maxEvaluations).setCrossover(crossover)
+            .setMutation(mutation).setSelection(selection).setEvaluator(evaluator).build();
 
         File rootDir = createDir(path);
-        File algorithmDir =
-            createDir(rootDir.getPath() + File.separator + algorithms + "_" + crossover.getClass().getSimpleName()
-                + "_" + mutation.getClass().getSimpleName() + File.separator);
+        File algorithmDir = createDir(rootDir.getPath() + File.separator + algorithms + "_"
+            + crossover.getClass().getSimpleName() + "_" + mutation.getClass().getSimpleName() + File.separator);
         File objectivesDir = createDir(algorithmDir.getPath() + File.separator);
 
         String outputDir = objectivesDir.getPath() + File.separator;

@@ -11,7 +11,6 @@ import org.uma.jmetal.operator.mutation.Mutation;
 import org.uma.jmetal.util.JMetalException;
 
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
-import edu.ufpr.cbio.psp.problem.PSPProblem;
 import edu.ufpr.cbio.psp.problem.custom.operators.IntegerTwoPointsCrossover;
 import edu.ufpr.cbio.psp.problem.custom.operators.UniformCrossover;
 import edu.ufpr.cbio.psp.problem.custom.operators.recent.LocalMoveOperator;
@@ -68,13 +67,10 @@ public class SPEA2TuningMultiobjectiveMain {
         }
 
         ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
-        int numberOfObjectives = 2;
 
         String configurationFileName = "Configuration.txt";
         String executionLog = "AllExecutions.log";
         String allConfigurationsFileName = "AllConfigurations.txt";
-
-        PSPProblem problem = new PSPProblem(proteinChain, numberOfObjectives);
 
         int configuration = 0;
 
@@ -112,7 +108,7 @@ public class SPEA2TuningMultiobjectiveMain {
 
                                     // Creating the task to execute the
                                     // configuration
-                                    SPEA2ExecutingTask spea2ExecutingTask = new SPEA2ExecutingTask(problem, crossover,
+                                    SPEA2ExecutingTask spea2ExecutingTask = new SPEA2ExecutingTask(crossover,
                                         Double.valueOf(crossoverProbability), crossoverName, mutation,
                                         Double.valueOf(mutationProbability), mutationName, Integer.valueOf(population),
                                         auxPopulation != null ? Integer.valueOf(auxPopulation) : null,

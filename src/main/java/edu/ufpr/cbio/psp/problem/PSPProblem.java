@@ -1,5 +1,6 @@
 package edu.ufpr.cbio.psp.problem;
 
+import java.io.PrintStream;
 import java.util.List;
 
 import org.uma.jmetal.core.Solution;
@@ -21,7 +22,21 @@ public class PSPProblem extends org.uma.jmetal.core.Problem {
 
     private String proteinChain;
 
-    public PSPProblem(String proteinChain, int numberOfObjectives) {
+    private double bestEnergyValuePerGen = 0.0;
+    private double bestEnergyValue = 0.0;
+    private String bestSolution = "";
+    private double distanceValuePerGen = 0.0;
+    private double distanceValue = 0.0;
+
+    private int evaluationCount = 0;
+
+    private int generationsCount = 0;
+
+    private int populationSize;
+
+    private PrintStream executionStream;
+
+    public PSPProblem(String proteinChain, int numberOfObjectives, int populationSize, PrintStream executionStream) {
 
         this.proteinChain = proteinChain;
         this.numberOfVariables = proteinChain.length() - 2;
@@ -37,6 +52,8 @@ public class PSPProblem extends org.uma.jmetal.core.Problem {
             upperLimit[i] = 2.0;
         }
         solutionType = new IntSolutionType(this);
+        this.populationSize = populationSize;
+        this.executionStream = executionStream;
 
     }
 
@@ -64,11 +81,47 @@ public class PSPProblem extends org.uma.jmetal.core.Problem {
             maxPointsDistance = 100;
         }
         if (numberOfObjectives == 2) {
-            solution.setObjective(0, -1 * topologicalContacts);
+            topologicalContacts = topologicalContacts * 1;
+            solution.setObjective(0, topologicalContacts);
             solution.setObjective(1, maxPointsDistance);
         } else if (numberOfObjectives == 1) {
-            solution.setObjective(0, -1 * topologicalContacts);
+            topologicalContacts = topologicalContacts * 1;
+            solution.setObjective(0, topologicalContacts);
         }
+
+        if (topologicalContacts > bestEnergyValuePerGen) {
+
+            bestEnergyValuePerGen = topologicalContacts;
+
+            XInt values = new XInt(solution);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < values.size(); i++) {
+                sb.append((int) values.getValue(i)).append(",");
+            }
+            sb.deleteCharAt(sb.length() - 1);
+            bestSolution = sb.toString();
+            distanceValuePerGen = maxPointsDistance;
+        }
+
+        if (topologicalContacts > bestEnergyValue) {
+            bestEnergyValue = topologicalContacts;
+            distanceValue = maxPointsDistance;
+        }
+
+        if (evaluationCount % populationSize == 0) {
+            executionStream.println("Generation: " + generationsCount + "; ");
+
+            executionStream
+                .println("d: " + distanceValuePerGen + "; energy: " + bestEnergyValuePerGen + "; " + bestSolution);
+            executionStream.println("Best fitness found so far: " + bestEnergyValue + "; distance: " + distanceValue);
+
+            bestSolution = "";
+            bestEnergyValuePerGen = -1.1;
+            distanceValuePerGen = -1;
+            generationsCount++;
+        }
+
+        evaluationCount++;
 
     }
 

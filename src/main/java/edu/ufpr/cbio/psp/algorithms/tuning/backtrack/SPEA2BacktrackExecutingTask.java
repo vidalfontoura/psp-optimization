@@ -21,7 +21,6 @@ public class SPEA2BacktrackExecutingTask implements Runnable {
 
     private static final String ALGORITHM_NAME = "SPEA2Backtrack";
 
-    private PSPProblem problem;
     private Crossover crossover;
     private double crossoverProbability;
     private double mutationProbability;
@@ -38,12 +37,11 @@ public class SPEA2BacktrackExecutingTask implements Runnable {
     private int executions;
     private double backtrackPercentage;
 
-    public SPEA2BacktrackExecutingTask(PSPProblem problem, Crossover crossover, double crossoverProbability,
-        String crossoverName, Mutation mutation, double mutationProbability, String mutationName, int population,
-        int auxPopulation, int maxEvaluation, String proteinChain, String algorithmPath, int configuration,
-        String configurationFileName, int executions, double backtrackPercentage) {
+    public SPEA2BacktrackExecutingTask(Crossover crossover, double crossoverProbability, String crossoverName,
+        Mutation mutation, double mutationProbability, String mutationName, int population, int auxPopulation,
+        int maxEvaluation, String proteinChain, String algorithmPath, int configuration, String configurationFileName,
+        int executions, double backtrackPercentage) {
 
-        this.problem = problem;
         this.crossover = crossover;
         this.mutation = mutation;
         this.population = population;
@@ -64,22 +62,24 @@ public class SPEA2BacktrackExecutingTask implements Runnable {
     @Override
     public void run() {
 
-        SPEA2BacktrackInitialization.Builder builder = new SPEA2BacktrackInitialization.Builder(problem);
-
-        builder.setMutation(mutation);
-        builder.setCrossover(crossover);
-        builder.setArchiveSize(auxPopulation);
-        builder.setPopulationSize(population);
-        builder.setMaxEvaluations(maxEvaluation);
-        builder.setAminoAcidSequence(proteinChain);
-        builder.setBacktrackPercentage(backtrackPercentage);
-
         File configurationDir = createDir(algorithmPath + File.separator + "C" + configuration);
         File objectivesDir = createDir(configurationDir.getPath() + File.separator);
         String outputDir = objectivesDir.getPath() + File.separator;
 
         try (PrintStream executionOut =
             new PrintStream(new FileOutputStream(configurationDir.getPath() + File.separator + "Execution.log"))) {
+
+            PSPProblem problem = new PSPProblem(proteinChain, 2, population, executionOut);
+
+            SPEA2BacktrackInitialization.Builder builder = new SPEA2BacktrackInitialization.Builder(problem);
+
+            builder.setMutation(mutation);
+            builder.setCrossover(crossover);
+            builder.setArchiveSize(auxPopulation);
+            builder.setPopulationSize(population);
+            builder.setMaxEvaluations(maxEvaluation);
+            builder.setAminoAcidSequence(proteinChain);
+            builder.setBacktrackPercentage(backtrackPercentage);
 
             SolutionSet allRuns = new SolutionSet();
             long allExecutionTime = 0;

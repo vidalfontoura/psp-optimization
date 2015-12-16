@@ -36,12 +36,10 @@ public class IBEAExecutingTask implements Runnable {
     private String configurationFileName;
     private int executions;
 
-    public IBEAExecutingTask(PSPProblem problem, Crossover crossover, double crossoverProbability, String crossoverName,
-        Mutation mutation, double mutationProbability, String mutationName, int population, int auxPopulation,
-        int maxEvaluation, String proteinChain, String algorithmPath, int configuration, String configurationFileName,
-        int executions) {
+    public IBEAExecutingTask(Crossover crossover, double crossoverProbability, String crossoverName, Mutation mutation,
+        double mutationProbability, String mutationName, int population, int auxPopulation, int maxEvaluation,
+        String proteinChain, String algorithmPath, int configuration, String configurationFileName, int executions) {
 
-        this.problem = problem;
         this.crossover = crossover;
         this.mutation = mutation;
         this.population = population;
@@ -61,20 +59,22 @@ public class IBEAExecutingTask implements Runnable {
     @Override
     public void run() {
 
-        IBEA.Builder builder = new IBEA.Builder(problem);
-
-        builder.setMutation(mutation);
-        builder.setCrossover(crossover);
-        builder.setArchiveSize(auxPopulation);
-        builder.setPopulationSize(population);
-        builder.setMaxEvaluations(maxEvaluation);
-
         File configurationDir = createDir(algorithmPath + File.separator + "C" + configuration);
         File objectivesDir = createDir(configurationDir.getPath() + File.separator);
         String outputDir = objectivesDir.getPath() + File.separator;
 
         try (PrintStream executionOut =
             new PrintStream(new FileOutputStream(configurationDir.getPath() + File.separator + "Execution.log"))) {
+
+            PSPProblem problem = new PSPProblem(proteinChain, 2, population, executionOut);
+
+            IBEA.Builder builder = new IBEA.Builder(problem);
+
+            builder.setMutation(mutation);
+            builder.setCrossover(crossover);
+            builder.setArchiveSize(auxPopulation);
+            builder.setPopulationSize(population);
+            builder.setMaxEvaluations(maxEvaluation);
 
             SolutionSet allRuns = new SolutionSet();
             long allExecutionTime = 0;

@@ -13,9 +13,13 @@ import org.uma.jmetal.operator.mutation.Mutation;
 import org.uma.jmetal.util.JMetalException;
 import org.uma.jmetal.util.comparator.DominanceComparator;
 
-import edu.ufpr.cbio.psp.problem.custom.operators.HHMutation;
 import edu.ufpr.cbio.psp.problem.custom.operators.IntegerTwoPointsCrossover;
 import edu.ufpr.cbio.psp.problem.custom.operators.UniformCrossover;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.LocalMoveOperator;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.LoopMoveOperator;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.MultiPointsCrossover;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.OppositeMoveOperator;
+import edu.ufpr.cbio.psp.problem.custom.operators.recent.SegmentMutationOperator;
 
 public class LowLevelHeuristic extends Operator {
 
@@ -249,11 +253,9 @@ public class LowLevelHeuristic extends Operator {
             return lowLevelHeuristics;
         }
 
-        public static List<LowLevelHeuristic> generateLowLevelHeuristics(String[] listCrossover,
-                                                                         double crossoverProbability,
-                                                                         String[] listMutation,
-                                                                         double mutationProbability, double alpha,
-                                                                         double beta) {
+        public static List<LowLevelHeuristic>
+            generateLowLevelHeuristics(String[] listCrossover, double crossoverProbability, String[] listMutation,
+                                       double mutationProbability, double alpha, double beta) {
 
             List<LowLevelHeuristic> lowLevelHeuristics = new ArrayList<LowLevelHeuristic>();
             int lowLevelHeuristicNumber = 0;
@@ -310,9 +312,17 @@ public class LowLevelHeuristic extends Operator {
                 crossover = new UniformCrossover.Builder().setCrossoverProbability(crossoverProbability).build();
                 break;
             }
+            case "MultiPointsCrossover": {
+                crossover = new MultiPointsCrossover(crossoverProbability);
+                break;
+            }
+            default: {
+                throw new JMetalException("Crossover operator not supported : " + crossoverName);
+            }
 
         }
         return crossover;
+
     }
 
     private static Mutation getMutation(String mutationName, double mutationProbability) {
@@ -323,12 +333,23 @@ public class LowLevelHeuristic extends Operator {
                 mutation = new BitFlipMutation.Builder().setProbability(mutationProbability).build();
                 break;
             }
-            case "HHMutation": {
-                mutation = new HHMutation.Builder().setProbability(mutationProbability).build();
+            case "LoopMoveOperator": {
+                mutation = new LoopMoveOperator(mutationProbability);
                 break;
             }
-            case "null": {
-                return null;
+            case "LocalMoveOperator": {
+                mutation = new LocalMoveOperator(mutationProbability);
+                break;
+            }
+            case "SegmentMutation": {
+                mutation = new SegmentMutationOperator(mutationProbability);
+                break;
+            }
+            case "OppositeMoveOperator": {
+                mutation = new OppositeMoveOperator(mutationProbability);
+                break;
+            }
+            default: {
             }
         }
         return mutation;

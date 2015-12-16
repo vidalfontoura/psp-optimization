@@ -11,7 +11,6 @@ import org.uma.jmetal.operator.mutation.Mutation;
 import org.uma.jmetal.util.JMetalException;
 
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
-import edu.ufpr.cbio.psp.problem.PSPProblem;
 import edu.ufpr.cbio.psp.problem.custom.operators.IntegerTwoPointsCrossover;
 import edu.ufpr.cbio.psp.problem.custom.operators.UniformCrossover;
 import edu.ufpr.cbio.psp.problem.custom.operators.recent.LocalMoveOperator;
@@ -82,8 +81,6 @@ public class IBEABacktrackTuningMultiobjectiveMain {
         String executionLog = "AllExecutions.log";
         String allConfigurationsFileName = "AllConfigurations.txt";
 
-        PSPProblem problem = new PSPProblem(proteinChain, numberOfObjectives);
-
         int configuration = 0;
 
         File rootDir = createDir(resultsPath);
@@ -124,8 +121,8 @@ public class IBEABacktrackTuningMultiobjectiveMain {
                                         // Creating the task to execute the
                                         // configuration
                                         IBEABacktrackExecutingTask ibea2ExecutingTask = new IBEABacktrackExecutingTask(
-                                            problem, crossover, Double.valueOf(crossoverProbability), crossoverName,
-                                            mutation, Double.valueOf(mutationProbability), mutationName,
+                                            crossover, Double.valueOf(crossoverProbability), crossoverName, mutation,
+                                            Double.valueOf(mutationProbability), mutationName,
                                             Integer.valueOf(population),
                                             auxPopulation != null ? Integer.valueOf(auxPopulation) : null,
                                             Integer.valueOf(maxEvaluation), proteinChain, algorithmDir.getPath(),

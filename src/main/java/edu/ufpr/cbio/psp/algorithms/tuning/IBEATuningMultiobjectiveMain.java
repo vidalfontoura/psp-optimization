@@ -11,7 +11,6 @@ import org.uma.jmetal.operator.mutation.Mutation;
 import org.uma.jmetal.util.JMetalException;
 
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
-import edu.ufpr.cbio.psp.problem.PSPProblem;
 import edu.ufpr.cbio.psp.problem.custom.operators.IntegerTwoPointsCrossover;
 import edu.ufpr.cbio.psp.problem.custom.operators.UniformCrossover;
 import edu.ufpr.cbio.psp.problem.custom.operators.recent.LocalMoveOperator;
@@ -68,13 +67,10 @@ public class IBEATuningMultiobjectiveMain {
         }
 
         ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
-        int numberOfObjectives = 2;
 
         String configurationFileName = "Configuration.txt";
         String executionLog = "AllExecutions.log";
         String allConfigurationsFileName = "AllConfigurations.txt";
-
-        PSPProblem problem = new PSPProblem(proteinChain, numberOfObjectives);
 
         int configuration = 0;
 
@@ -112,7 +108,7 @@ public class IBEATuningMultiobjectiveMain {
 
                                     // Creating the task to execute the
                                     // configuration
-                                    IBEAExecutingTask ibea2ExecutingTask = new IBEAExecutingTask(problem, crossover,
+                                    IBEAExecutingTask ibea2ExecutingTask = new IBEAExecutingTask(crossover,
                                         Double.valueOf(crossoverProbability), crossoverName, mutation,
                                         Double.valueOf(mutationProbability), mutationName, Integer.valueOf(population),
                                         auxPopulation != null ? Integer.valueOf(auxPopulation) : null,

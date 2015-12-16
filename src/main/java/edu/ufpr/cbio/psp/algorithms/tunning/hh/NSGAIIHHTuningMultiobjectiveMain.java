@@ -7,9 +7,9 @@ import java.util.concurrent.Executors;
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
 import edu.ufpr.cbio.psp.problem.utils.ProteinChainUtils;
 
-public class SPEA2HHTuningMultiobjectiveMain {
+public class NSGAIIHHTuningMultiobjectiveMain {
 
-    private static final String ALGORITHM_NAME = "SPEA2HH";
+    private static final String ALGORITHM_NAME = "NSGAIIHH";
     public static int executedTasks = 0;
 
     public static void main(String[] args) throws Exception {
@@ -18,7 +18,6 @@ public class SPEA2HHTuningMultiobjectiveMain {
         String[] maxEvaluations = null;
         String[] crossovers = null;
         String[] mutations = null;
-        String[] auxPopulations = null;
         double crossoverProbability = 0.0;
         double mutationProbability = 0.0;
         String proteinChain = null;
@@ -31,30 +30,28 @@ public class SPEA2HHTuningMultiobjectiveMain {
         int executions = 0;
         boolean logChoiceBehavior = false;
         double backtrackPercentage = 0.0;
-        if (args.length == 16) {
+        if (args.length == 15) {
             populations = args[0].split(",");
             maxEvaluations = args[1].split(",");
             crossovers = args[2].split(",");
             mutations = args[3].split(",");
-            auxPopulations = args[4].split(",");
-            crossoverProbability = Double.valueOf(args[5]);
-            mutationProbability = Double.valueOf(args[6]);
-            executions = Integer.valueOf(args[7]);
-            numberOfThreads = Integer.valueOf(args[8]);
-            resultsPath = args[9];
-            alphas = args[10].split(",");
-            betas = args[11].split(",");
-            llhComparator = args[12];
-            proteinChain = args[13];
-            logChoiceBehavior = Boolean.getBoolean(args[14]);
-            backtrackPercentage = Double.valueOf(args[15]);
+            crossoverProbability = Double.valueOf(args[4]);
+            mutationProbability = Double.valueOf(args[5]);
+            executions = Integer.valueOf(args[6]);
+            numberOfThreads = Integer.valueOf(args[7]);
+            resultsPath = args[8];
+            alphas = args[9].split(",");
+            betas = args[10].split(",");
+            llhComparator = args[11];
+            proteinChain = args[12];
+            logChoiceBehavior = Boolean.getBoolean(args[13]);
+            backtrackPercentage = Double.valueOf(args[14]);
 
         } else {
             populations = new String[] { "200" };
             maxEvaluations = new String[] { /* "40000", */"40000" };
             crossovers = new String[] { "SinglePointCrossover", "IntegerTwoPointsCrossover", "UniformCrossover" };
             mutations = new String[] { "BitFlipMutation", "null" };
-            auxPopulations = new String[] { "200" };
             crossoverProbability = 1;
             mutationProbability = 1;
             executions = 1;
@@ -64,12 +61,13 @@ public class SPEA2HHTuningMultiobjectiveMain {
             betas = new String[] { "0.00005", };
             proteinChain =
                 "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
-            llhComparator = "ChoiceFunction";
+            llhComparator = "Random";
             logChoiceBehavior = true;
-            backtrackPercentage = 20.0;
+            backtrackPercentage = 20;
         }
 
         ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
+        int numberOfObjectives = 2;
 
         String configurationFileName = "Configuration.txt";
         String executionLog = "AllExecutions.log";
@@ -83,34 +81,30 @@ public class SPEA2HHTuningMultiobjectiveMain {
 
         for (int i = 0; i < populations.length; i++) {
             Integer population = Integer.valueOf(populations[i]);
-            for (int w = 0; w < auxPopulations.length; w++) {
-                Integer auxPopulation = Integer.valueOf(auxPopulations[w]);
-                for (int j = 0; j < maxEvaluations.length; j++) {
-                    Integer maxEvaluation = Integer.valueOf(maxEvaluations[j]);
+            for (int j = 0; j < maxEvaluations.length; j++) {
+                Integer maxEvaluation = Integer.valueOf(maxEvaluations[j]);
 
-                    for (int t = 0; t < alphas.length; t++) {
-                        double alpha = Double.valueOf(alphas[t]);
-                        for (int h = 0; h < betas.length; h++) {
-                            double beta = Double.valueOf(betas[h]);
+                for (int t = 0; t < alphas.length; t++) {
+                    double alpha = Double.valueOf(alphas[t]);
+                    for (int h = 0; h < betas.length; h++) {
+                        double beta = Double.valueOf(betas[h]);
 
-                            // Output files
-                            // All configurations log
-                            ConfigurationExecutionLogger.logAllConfigurationHH(configuration, ALGORITHM_NAME,
-                                Integer.valueOf(population),
-                                auxPopulation != null ? Integer.valueOf(auxPopulation) : null, crossovers,
-                                crossoverProbability, mutations, mutationProbability, Integer.valueOf(maxEvaluation),
-                                algorithmDir.getPath() + File.separator + allConfigurationsFileName, alpha, beta);
+                        // Output files
+                        // All configurations log
+                        ConfigurationExecutionLogger.logAllConfigurationHH(configuration, ALGORITHM_NAME,
+                            Integer.valueOf(population), null, crossovers, crossoverProbability, mutations,
+                            mutationProbability, Integer.valueOf(maxEvaluation),
+                            algorithmDir.getPath() + File.separator + allConfigurationsFileName, alpha, beta);
 
-                            // Creating the task to execute the configuration
-                            SPEA2HHExecutingTask spea2ExecutionTask =
-                                new SPEA2HHExecutingTask(crossovers, Double.valueOf(crossoverProbability), mutations,
-                                    Double.valueOf(mutationProbability), population, auxPopulation, maxEvaluation,
-                                    proteinChain, algorithmDir.getPath(), configuration, configurationFileName,
-                                    executions, alpha, beta, llhComparator, logChoiceBehavior, backtrackPercentage);
+                        // Creating the task to execute the configuration
+                        NSGAIIExecutingTask nsgaIIExecutionTask =
+                            new NSGAIIExecutingTask(crossovers, Double.valueOf(crossoverProbability), mutations,
+                                Double.valueOf(mutationProbability), population, maxEvaluation, proteinChain,
+                                algorithmDir.getPath(), configuration, configurationFileName, executions, alpha, beta,
+                                llhComparator, logChoiceBehavior, backtrackPercentage);
 
-                            executor.execute(spea2ExecutionTask);
-                            configuration++;
-                        }
+                        executor.execute(nsgaIIExecutionTask);
+                        configuration++;
                     }
                 }
             }

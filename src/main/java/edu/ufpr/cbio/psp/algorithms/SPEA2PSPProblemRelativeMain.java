@@ -37,11 +37,12 @@ public class SPEA2PSPProblemRelativeMain {
         String proteinChain =
             "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
         int numberOfObjectives = 2;
-        problem = new PSPProblem(proteinChain, numberOfObjectives);
+
+        int populationSize = 300;
+        problem = new PSPProblem(proteinChain, numberOfObjectives, populationSize, System.out);
 
         SPEA2.Builder builder = new SPEA2.Builder(problem);
 
-        int populationSize = 300;
         builder.setPopulationSize(populationSize);
 
         int maxEvaluations = 60000;
@@ -73,9 +74,8 @@ public class SPEA2PSPProblemRelativeMain {
         algorithm = builder.build();
 
         File rootDir = createDir(path);
-        File algorithmDir =
-            createDir(rootDir.getPath() + File.separator + algorithms + "_" + crossover.getClass().getSimpleName()
-                + "_" + mutation.getClass().getSimpleName() + File.separator);
+        File algorithmDir = createDir(rootDir.getPath() + File.separator + algorithms + "_"
+            + crossover.getClass().getSimpleName() + "_" + mutation.getClass().getSimpleName() + File.separator);
         File objectivesDir = createDir(algorithmDir.getPath() + File.separator);
 
         String outputDir = objectivesDir.getPath() + File.separator;

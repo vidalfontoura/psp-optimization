@@ -5,12 +5,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
-import edu.ufpr.cbio.psp.problem.PSPProblem;
 import edu.ufpr.cbio.psp.problem.utils.ProteinChainUtils;
 
 public class IBEAHHTuningMultiobjectiveMain {
 
-    private static final String ALGORITHM_NAME = "IBEA";
+    private static final String ALGORITHM_NAME = "IBEAHH";
     public static int executedTasks = 0;
 
     public static void main(String[] args) throws Exception {
@@ -31,7 +30,8 @@ public class IBEAHHTuningMultiobjectiveMain {
         String[] betas = null;
         int executions = 0;
         boolean logChoiceBehavior = false;
-        if (args.length == 15) {
+        double backtrackPercentage = 0.0;
+        if (args.length == 16) {
             populations = args[0].split(",");
             maxEvaluations = args[1].split(",");
             crossovers = args[2].split(",");
@@ -47,12 +47,15 @@ public class IBEAHHTuningMultiobjectiveMain {
             llhComparator = args[12];
             proteinChain = args[13];
             logChoiceBehavior = Boolean.getBoolean(args[14]);
+            backtrackPercentage = Double.valueOf(args[15]);
 
         } else {
             populations = new String[] { "200" };
             maxEvaluations = new String[] { /* "40000", */"40000" };
-            crossovers = new String[] { "SinglePointCrossover", "IntegerTwoPointsCrossover", "UniformCrossover" };
-            mutations = new String[] { "BitFlipMutation", "null" };
+            crossovers = new String[] { "SinglePointCrossover", "IntegerTwoPointsCrossover", "UniformCrossover",
+                "MultiPointsCrossover" };
+            mutations = new String[] { "BitFlipMutation", "OppositeMoveOperator", "SegmentMutation",
+                "LocalMoveOperator", "LoopMoveOperator", "null" };
             auxPopulations = new String[] { "200" };
             crossoverProbability = 1;
             mutationProbability = 1;
@@ -63,8 +66,9 @@ public class IBEAHHTuningMultiobjectiveMain {
             betas = new String[] { "0.00005", };
             proteinChain =
                 "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
-            llhComparator = "ChoiceFunction";
+            llhComparator = "Random";
             logChoiceBehavior = true;
+            backtrackPercentage = 20;
         }
 
         ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
@@ -73,8 +77,6 @@ public class IBEAHHTuningMultiobjectiveMain {
         String configurationFileName = "Configuration.txt";
         String executionLog = "AllExecutions.log";
         String allConfigurationsFileName = "AllConfigurations.txt";
-
-        PSPProblem problem = new PSPProblem(proteinChain, numberOfObjectives);
 
         int configuration = 0;
         File rootDir = createDir(resultsPath);
@@ -96,18 +98,18 @@ public class IBEAHHTuningMultiobjectiveMain {
 
                             // Output files
                             // All configurations log
-                            ConfigurationExecutionLogger.logAllConfigurationHH(configuration, ALGORITHM_NAME, Integer
-                                .valueOf(population), auxPopulation != null ? Integer.valueOf(auxPopulation) : null,
-                                crossovers, crossoverProbability, mutations, mutationProbability, Integer
-                                    .valueOf(maxEvaluation), algorithmDir.getPath() + File.separator
-                                    + allConfigurationsFileName, alpha, beta);
+                            ConfigurationExecutionLogger.logAllConfigurationHH(configuration, ALGORITHM_NAME,
+                                Integer.valueOf(population),
+                                auxPopulation != null ? Integer.valueOf(auxPopulation) : null, crossovers,
+                                crossoverProbability, mutations, mutationProbability, Integer.valueOf(maxEvaluation),
+                                algorithmDir.getPath() + File.separator + allConfigurationsFileName, alpha, beta);
 
                             // Creating the task to execute the configuration
                             IBEAHHExecutingTask ibeaExecutionTask =
-                                new IBEAHHExecutingTask(problem, crossovers, Double.valueOf(crossoverProbability),
-                                    mutations, Double.valueOf(mutationProbability), population, auxPopulation,
-                                    maxEvaluation, proteinChain, algorithmDir.getPath(), configuration,
-                                    configurationFileName, executions, alpha, beta, llhComparator, logChoiceBehavior);
+                                new IBEAHHExecutingTask(crossovers, Double.valueOf(crossoverProbability), mutations,
+                                    Double.valueOf(mutationProbability), population, auxPopulation, maxEvaluation,
+                                    proteinChain, algorithmDir.getPath(), configuration, configurationFileName,
+                                    executions, alpha, beta, llhComparator, logChoiceBehavior, backtrackPercentage);
 
                             executor.execute(ibeaExecutionTask);
                             configuration++;
@@ -118,14 +120,15 @@ public class IBEAHHTuningMultiobjectiveMain {
         }
 
         while (executedTasks < configuration) {
-            ConfigurationExecutionLogger.logMessage("Total tasks config " + configuration + " executed "
-                + executedTasks, algorithmDir + File.separator + executionLog);
+            ConfigurationExecutionLogger.logMessage(
+                "Total tasks config " + configuration + " executed " + executedTasks,
+                algorithmDir + File.separator + executionLog);
             System.out.println("Total tasks config " + configuration + " executed " + executedTasks);
             Thread.sleep(30000);
 
         }
-        ConfigurationExecutionLogger.logMessage("End of " + configuration + "configurations executions ", algorithmDir
-            + File.separator + executionLog);
+        ConfigurationExecutionLogger.logMessage("End of " + configuration + "configurations executions ",
+            algorithmDir + File.separator + executionLog);
         System.out.println("End of " + configuration + " configurations executions ");
         System.exit(0);
 

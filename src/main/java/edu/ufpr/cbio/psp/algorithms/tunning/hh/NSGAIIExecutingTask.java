@@ -1,68 +1,68 @@
-/*
- * Copyright 2015, Charter Communications, All rights reserved.
- */
-package edu.ufpr.cbio.psp.algorithms.tuning.backtrack;
+package edu.ufpr.cbio.psp.algorithms.tunning.hh;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.List;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.uma.jmetal.core.Algorithm;
 import org.uma.jmetal.core.SolutionSet;
-import org.uma.jmetal.operator.crossover.Crossover;
-import org.uma.jmetal.operator.mutation.Mutation;
 import org.uma.jmetal.operator.selection.BinaryTournament2;
 import org.uma.jmetal.operator.selection.Selection;
+import org.uma.jmetal.util.evaluator.SequentialSolutionSetEvaluator;
 import org.uma.jmetal.util.fileoutput.SolutionSetOutput;
 
-import edu.ufpr.cbio.psp.algorithms.backtrack.IBEABacktrackInitialization;
+import edu.ufpr.cbio.psp.algorithms.hyperheuristic.NSGAIIHyperHeuristic;
+import edu.ufpr.cbio.psp.algorithms.hyperheuristic.lowlevelheuristic.LowLevelHeuristic;
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
 import edu.ufpr.cbio.psp.problem.PSPProblem;
 
-/**
- *
- *
- * @author Vidal
- */
-public class IBEABacktrackExecutingTask implements Runnable {
+public class NSGAIIExecutingTask implements Runnable {
 
-    private static final String ALGORITHM_NAME = "IBEABacktrack";
-    private Crossover crossover;
+    private static final String ALGORITHM_NAME = "NSGAIIHH";
+
+    private PSPProblem problem;
     private double crossoverProbability;
     private double mutationProbability;
-    private Mutation mutation;
     private int population;
-    private int auxPopulation;
     private int maxEvaluation;
-    private String crossoverName;
-    private String mutationName;
     private String proteinChain;
     private String algorithmPath;
     private int configuration;
     private String configurationFileName;
     private int executions;
+
+    private String[] crossovers;
+    private String[] mutations;
+
+    private double alpha;
+    private double beta;
+
+    private String llhComparator;
+    private boolean logChoiceFunctionBehavior;
+
     private double backtrackPercentage;
 
-    public IBEABacktrackExecutingTask(Crossover crossover, double crossoverProbability, String crossoverName,
-        Mutation mutation, double mutationProbability, String mutationName, int population, int auxPopulation,
-        int maxEvaluation, String proteinChain, String algorithmPath, int configuration, String configurationFileName,
-        int executions, double backtrackPercentage) {
+    public NSGAIIExecutingTask(String[] crossovers, double crossoverProbability, String[] mutations,
+        double mutationProbability, int population, int maxEvaluation, String proteinChain, String algorithmPath,
+        int configuration, String configurationFileName, int executions, double alpha, double beta,
+        String llhComparator, boolean logChoiceFunctionBehavior, double backtrackPercentage) {
 
-        this.crossover = crossover;
-        this.mutation = mutation;
         this.population = population;
-        this.auxPopulation = auxPopulation;
         this.maxEvaluation = maxEvaluation;
         this.proteinChain = proteinChain;
-        this.crossoverName = crossoverName;
-        this.mutationName = mutationName;
         this.crossoverProbability = crossoverProbability;
         this.mutationProbability = mutationProbability;
         this.algorithmPath = algorithmPath;
         this.configuration = configuration;
         this.configurationFileName = configurationFileName;
         this.executions = executions;
+        this.crossovers = crossovers;
+        this.mutations = mutations;
+        this.alpha = alpha;
+        this.beta = beta;
+        this.llhComparator = llhComparator;
+        this.logChoiceFunctionBehavior = logChoiceFunctionBehavior;
         this.backtrackPercentage = backtrackPercentage;
     }
 
@@ -75,50 +75,64 @@ public class IBEABacktrackExecutingTask implements Runnable {
 
         try (PrintStream executionOut =
             new PrintStream(new FileOutputStream(configurationDir.getPath() + File.separator + "Execution.log"))) {
+            SequentialSolutionSetEvaluator sequentialSolutionSetEvaluator = new SequentialSolutionSetEvaluator();
 
             PSPProblem problem = new PSPProblem(proteinChain, 2, population, executionOut);
 
-            IBEABacktrackInitialization.Builder builder = new IBEABacktrackInitialization.Builder(problem);
-
-            builder.setMutation(mutation);
-            builder.setCrossover(crossover);
-            builder.setArchiveSize(auxPopulation);
+            NSGAIIHyperHeuristic.Builder builder =
+                new NSGAIIHyperHeuristic.Builder(problem, sequentialSolutionSetEvaluator);
             builder.setPopulationSize(population);
             builder.setMaxEvaluations(maxEvaluation);
+            builder.setLLHComparator(llhComparator);
+            builder.setBacktrackPercentage(backtrackPercentage);
             builder.setAminoAcidSequence(proteinChain);
-            builder.setPercentageBacktrackPopulation(backtrackPercentage);
+
+            List<LowLevelHeuristic> lowLevelHeuristics = LowLevelHeuristic.Builder.generateLowLevelHeuristics(
+                crossovers, crossoverProbability, mutations, mutationProbability, alpha, beta);
+            builder.setLowLevelHeuristics(lowLevelHeuristics);
+
+            ConfigurationExecutionLogger.logLowLevelHeuristics(lowLevelHeuristics, llhComparator,
+                configurationDir.getPath() + File.separator + "LowLevelInfo.txt");
+
+            Selection selection = new BinaryTournament2.Builder().build();
+            builder.setSelection(selection);
 
             SolutionSet allRuns = new SolutionSet();
             long allExecutionTime = 0;
             executionOut.println("Algorithm configured with: ");
             executionOut.println("Pop: " + population);
-            executionOut.println("Aux Pop: " + auxPopulation);
-            executionOut.println("Crossover: " + crossoverName);
             executionOut.println("CrP: " + crossoverProbability);
-            executionOut.println("Mutation: " + mutationName);
             executionOut.println("MtP: " + mutationProbability);
-            executionOut.println("Backtrack Percentage: " + backtrackPercentage);
-            executionOut.println("Starting executions...");
+            executionOut.println("List of crossover: ");
+            for (String crossover : crossovers) {
+                executionOut.println(crossover);
+            }
+            executionOut.println("List of mutations: ");
+            for (String mutation : mutations) {
+                executionOut.println(mutation);
+            }
 
-            ConfigurationExecutionLogger.logConfiguration(ALGORITHM_NAME, population, auxPopulation, crossoverName,
-                crossoverProbability, mutationName, mutationProbability, maxEvaluation, proteinChain,
-                outputDir + File.separator + configurationFileName, backtrackPercentage);
+            ConfigurationExecutionLogger.logConfigurationHH(ALGORITHM_NAME, population, null, crossovers, mutations,
+                crossoverProbability, mutationProbability, maxEvaluation, proteinChain,
+                outputDir + File.separator + configurationFileName);
 
             for (int i = 0; i < executions; i++) {
+                String executionDirectory = outputDir + "EXECUTION_" + i;
+                createDir(executionDirectory);
+
+                if (!llhComparator.equals("Random") && logChoiceFunctionBehavior) {
+                    builder.setChoiceFunctionLoggerFileName(executionDirectory + File.separator + "choiceBehavior.log");
+                }
+                NSGAIIHyperHeuristic algorithm = (NSGAIIHyperHeuristic) builder.build("NSGAII");
+                algorithm.clearLowLevelHeuristics();
 
                 executionOut.println("Execution: " + (i + 1));
-                Selection selection = new BinaryTournament2.Builder().build();
-                builder.setSelection(selection);
-                Algorithm algorithm = builder.build();
 
                 long initTime = System.currentTimeMillis();
                 SolutionSet nonDominatedPopulation = algorithm.execute();
                 long estimatedTime = System.currentTimeMillis() - initTime;
 
                 allExecutionTime += estimatedTime;
-
-                String executionDirectory = outputDir + "EXECUTION_" + i;
-                createDir(executionDirectory);
 
                 problem.removeDominateds(nonDominatedPopulation);
                 problem.removeDuplicates(nonDominatedPopulation);
@@ -127,6 +141,9 @@ public class IBEABacktrackExecutingTask implements Runnable {
                     executionDirectory + File.separator + "VAR.txt");
                 SolutionSetOutput.printObjectivesToFile(nonDominatedPopulation,
                     executionDirectory + File.separator + "FUN.txt");
+
+                ConfigurationExecutionLogger.logLowLevelHeuristics(lowLevelHeuristics, llhComparator,
+                    executionDirectory + File.separator + "LLH.txt");
 
                 allRuns = allRuns.union(nonDominatedPopulation);
             }
@@ -145,18 +162,19 @@ public class IBEABacktrackExecutingTask implements Runnable {
             SolutionSetOutput.printObjectivesToFile(allRuns, outputDir + "FUN.txt");
 
         } catch (Exception e) {
+
             ConfigurationExecutionLogger.logMessage("ERROR: Occured while executing C" + this.configuration + ":",
-                configurationDir.getPath() + File.separator + "Error.log");
+                configurationDir.getPath() + File.separator + "error.log");
             ConfigurationExecutionLogger.logMessage(ExceptionUtils.getStackTrace(e),
                 configurationDir.getPath() + File.separator + "Error.log");
 
             ConfigurationExecutionLogger.logMessage("ERROR: occured while executing C" + this.configuration + ":",
-                algorithmPath + File.separator + "AllExecutions.log");
+                algorithmPath + File.separator + "executions.log");
             ConfigurationExecutionLogger.logMessage(ExceptionUtils.getStackTrace(e),
                 algorithmPath + File.separator + "AllExecutions.log");
 
         }
-        IBEABacktrackTuningMultiobjectiveMain.executedTasks++;
+        NSGAIIHHTuningMultiobjectiveMain.executedTasks++;
 
     }
 

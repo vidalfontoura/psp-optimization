@@ -38,11 +38,11 @@ public class IBEAHyperHeuristicPSPMain {
         String proteinChain =
             "PPPPPPHPHHPPPPPHHHPHHHHHPHHPPPPHHPPHHPHHHHHPHHHHHHHHHHPHHPHHHHHHHPPPPPPPPPPPHHHHHHHPPHPHHHPPPPPPHPHH";
         int numberOfObjectives = 2;
-        problem = new PSPProblem(proteinChain, numberOfObjectives);
+        int populationSize = 100;
+        problem = new PSPProblem(proteinChain, numberOfObjectives, populationSize, System.out);
 
         IBEAHyperHeuristic.Builder builder = new IBEAHyperHeuristic.Builder(problem);
 
-        int populationSize = 100;
         builder.setPopulationSize(populationSize);
 
         int maxEvaluations = 25000;

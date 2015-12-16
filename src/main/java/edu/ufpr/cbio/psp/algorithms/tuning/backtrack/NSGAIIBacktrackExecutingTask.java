@@ -21,7 +21,6 @@ import edu.ufpr.cbio.psp.problem.PSPProblem;
 public class NSGAIIBacktrackExecutingTask implements Runnable {
 
     private static final String ALGORITHM_NAME = "NSGAIIBacktrack";
-    private PSPProblem problem;
     private Crossover crossover;
     private double crossoverProbability;
     private double mutationProbability;
@@ -37,12 +36,11 @@ public class NSGAIIBacktrackExecutingTask implements Runnable {
     private int executions;
     private double backtrackPercentage;
 
-    public NSGAIIBacktrackExecutingTask(PSPProblem problem, Crossover crossover, double crossoverProbability,
-        String crossoverName, Mutation mutation, double mutationProbability, String mutationName, int population,
-        int maxEvaluation, String proteinChain, String algorithmPath, int configuration, String configurationFileName,
-        int executions, double backtrackPercentage) {
+    public NSGAIIBacktrackExecutingTask(Crossover crossover, double crossoverProbability, String crossoverName,
+        Mutation mutation, double mutationProbability, String mutationName, int population, int maxEvaluation,
+        String proteinChain, String algorithmPath, int configuration, String configurationFileName, int executions,
+        double backtrackPercentage) {
 
-        this.problem = problem;
         this.crossover = crossover;
         this.mutation = mutation;
         this.population = population;
@@ -64,22 +62,24 @@ public class NSGAIIBacktrackExecutingTask implements Runnable {
 
         SequentialSolutionSetEvaluator evaluator = new SequentialSolutionSetEvaluator();
 
-        NSGAIIBacktrakInitializationTemplate.Builder builder =
-            new NSGAIIBacktrakInitializationTemplate.Builder(problem, evaluator);
-
-        builder.setMutation(mutation);
-        builder.setCrossover(crossover);
-        builder.setPopulationSize(population);
-        builder.setMaxEvaluations(maxEvaluation);
-        builder.setAminoAcidSequence(proteinChain);
-        builder.setBacktrackPercentage(backtrackPercentage);
-
         File configurationDir = createDir(algorithmPath + File.separator + "C" + configuration);
         File objectivesDir = createDir(configurationDir.getPath() + File.separator);
         String outputDir = objectivesDir.getPath() + File.separator;
 
         try (PrintStream executionOut =
             new PrintStream(new FileOutputStream(configurationDir.getPath() + File.separator + "Execution.log"))) {
+
+            PSPProblem problem = new PSPProblem(proteinChain, 2, population, executionOut);
+
+            NSGAIIBacktrakInitializationTemplate.Builder builder =
+                new NSGAIIBacktrakInitializationTemplate.Builder(problem, evaluator);
+
+            builder.setMutation(mutation);
+            builder.setCrossover(crossover);
+            builder.setPopulationSize(population);
+            builder.setMaxEvaluations(maxEvaluation);
+            builder.setAminoAcidSequence(proteinChain);
+            builder.setBacktrackPercentage(backtrackPercentage);
 
             SolutionSet allRuns = new SolutionSet();
             long allExecutionTime = 0;
