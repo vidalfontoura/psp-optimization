@@ -1,0 +1,27 @@
+Algorithm configured with: 
+Pop: 10000
+CrP: 1.0
+MtP: 1.0
+List of crossover: 
+SinglePointCrossover
+IntegerTwoPointsCrossover
+MultiPointsCrossover
+List of mutations: 
+BitFlipMutation
+LoopMoveOperator
+LocalMoveOperator
+SegmentMutation
+OppositeMoveOperator
+Execution: 1
+Generation: 0; 
+d: 15.264337522473747; energy: -4.0; 1,1,2,2,0,1,2,2,0,0,2,0,1,0,1,1,1,0,1,1,2,0,1,2,0,0,1,2,1,1,0,2,1,1,1,2,2,1,1,0,0,1,1,2,2,0,1,0
+Best fitness found so far: -4.0; distance: 15.264337522473747
+Generation: 1; 
+d: 10.770329614269007; energy: -12.0; 0,0,1,0,2,0,1,0,0,2,1,1,1,1,0,0,2,1,0,1,1,2,0,1,2,1,0,2,0,0,1,1,2,1,0,0,1,1,1,2,2,0,2,1,1,2,2,1
+Best fitness found so far: -12.0; distance: 10.770329614269007
+Generation: 2; 
+d: 11.180339887498949; energy: -12.0; 1,0,0,0,0,0,1,0,2,0,0,1,2,1,2,1,0,0,0,1,0,2,0,1,0,2,2,1,1,1,1,0,2,2,0,2,2,1,2,1,1,2,2,2,2,1,2,2
+Best fitness found so far: -12.0; distance: 10.770329614269007
+Generation: 3; 
+d: 13.892443989449804; energy: -12.0; 0,0,1,0,2,0,0,1,1,2,2,1,1,1,1,0,2,1,2,0,2,2,1,1,1,2,0,0,1,0,1,0,0,2,1,0,0,1,2,1,2,0,2,1,2,1,2,2
+Best fitness found so far: -12.0; distance: 10.770329614269007

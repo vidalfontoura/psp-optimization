@@ -1,0 +1,15 @@
+h0 [SinglePointCrossover,BitFlipMutation] 2042
+h1 [SinglePointCrossover,LoopMoveOperator] 2023
+h2 [SinglePointCrossover,LocalMoveOperator] 2037
+h3 [SinglePointCrossover,SegmentMutation] 2012
+h4 [SinglePointCrossover,OppositeMoveOperator] 1913
+h5 [IntegerTwoPointsCrossover,BitFlipMutation] 1944
+h6 [IntegerTwoPointsCrossover,LoopMoveOperator] 1978
+h7 [IntegerTwoPointsCrossover,LocalMoveOperator] 2061
+h8 [IntegerTwoPointsCrossover,SegmentMutation] 2020
+h9 [IntegerTwoPointsCrossover,OppositeMoveOperator] 1980
+h10 [MultiPointsCrossover,BitFlipMutation] 1932
+h11 [MultiPointsCrossover,LoopMoveOperator] 1972
+h12 [MultiPointsCrossover,LocalMoveOperator] 1913
+h13 [MultiPointsCrossover,SegmentMutation] 1962
+h14 [MultiPointsCrossover,OppositeMoveOperator] 2011

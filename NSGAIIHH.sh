@@ -1,5 +1,5 @@
 java -jar target/NSGAIIHH.jar \
-				300,400,500,600,700,900,10000 \
+				300,400,500,600,700,900,1000 \
 				60000 \
 				SinglePointCrossover,IntegerTwoPointsCrossover,MultiPointsCrossover \
 				BitFlipMutation,LoopMoveOperator,LocalMoveOperator,SegmentMutation,OppositeMoveOperator \
@@ -11,6 +11,6 @@ java -jar target/NSGAIIHH.jar \
 				0 \
 				0 \
 				Random \
-				HHPHPHPHPHHHHPHPPPHPPPHPPPPHPPPHPPPHPHHHHPHPHPHPHH \
+				HHHHPPPPHHHHHHHHHHHHPPPPPPHHHHHHHHHHHHPPPHHHHHHHHHHHHPPPHHHHHHHHHHHHPPPHPPHHPPHHPPHPH \
 				false \
 				20,50 &
