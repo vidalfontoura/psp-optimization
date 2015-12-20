@@ -1,17 +1,17 @@
 java -jar target/IBEAHH.jar \
-				300,400,500,600,700,900,1000 \
-				60000 \
+				1000,5000 \
+				2500000 \
 				SinglePointCrossover,IntegerTwoPointsCrossover,MultiPointsCrossover \
 				BitFlipMutation,LoopMoveOperator,LocalMoveOperator,SegmentMutation,OppositeMoveOperator \
 				200 \
 				1.0 \
 				1.0 \
-				30 \
+				10 \
 				15 \
-				result-hh \
+				result-hh-more-individuals \
 				0 \
 				0 \
 				Random \
-				HHHHPPPPHHHHHHHHHHHHPPPPPPHHHHHHHHHHHHPPPHHHHHHHHHHHHPPPHHHHHHHHHHHHPPPHPPHHPPHHPPHPH \
+				PPHHHPHHHHHHHHPPPHHHHHHHHHHPHPPPHHHHHHHHHHHHPPPPHHHHHHPHHPHP \
 				false \
-				20,50 &
+				20 &
