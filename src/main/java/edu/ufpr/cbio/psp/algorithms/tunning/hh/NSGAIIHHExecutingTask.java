@@ -17,7 +17,7 @@ import edu.ufpr.cbio.psp.algorithms.hyperheuristic.lowlevelheuristic.LowLevelHeu
 import edu.ufpr.cbio.psp.algorithms.loggers.ConfigurationExecutionLogger;
 import edu.ufpr.cbio.psp.problem.PSPProblem;
 
-public class NSGAIIExecutingTask implements Runnable {
+public class NSGAIIHHExecutingTask implements Runnable {
 
     private static final String ALGORITHM_NAME = "NSGAIIHH";
 
@@ -43,7 +43,7 @@ public class NSGAIIExecutingTask implements Runnable {
 
     private double backtrackPercentage;
 
-    public NSGAIIExecutingTask(String[] crossovers, double crossoverProbability, String[] mutations,
+    public NSGAIIHHExecutingTask(String[] crossovers, double crossoverProbability, String[] mutations,
         double mutationProbability, int population, int maxEvaluation, String proteinChain, String algorithmPath,
         int configuration, String configurationFileName, int executions, double alpha, double beta,
         String llhComparator, boolean logChoiceFunctionBehavior, double backtrackPercentage) {

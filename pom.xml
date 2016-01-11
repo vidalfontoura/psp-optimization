@@ -157,6 +157,43 @@
                             </archive>
                         </configuration>
                     </execution>
+                    
+                    
+                    
+                    
+                    
+                    <execution>
+                        <id>IBEA</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>IBEAHH</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tunning.IBEATuningMultiobjectiveMain</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                   
+                    
+                     <execution>
+                        <id>NSGAII</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>NSGAIIHH</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tunning.NSGAIITuningMultiobjectiveMain</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             </plugins>

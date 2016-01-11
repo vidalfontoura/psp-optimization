@@ -101,8 +101,8 @@ public class NSGAIIHHTuningMultiobjectiveMain {
                                 backtrackPercentage);
 
                             // Creating the task to execute the configuration
-                            NSGAIIExecutingTask nsgaIIExecutionTask =
-                                new NSGAIIExecutingTask(crossovers, Double.valueOf(crossoverProbability), mutations,
+                            NSGAIIHHExecutingTask nsgaIIExecutionTask =
+                                new NSGAIIHHExecutingTask(crossovers, Double.valueOf(crossoverProbability), mutations,
                                     Double.valueOf(mutationProbability), population, maxEvaluation, proteinChain,
                                     algorithmDir.getPath(), configuration, configurationFileName, executions, alpha,
                                     beta, llhComparator, logChoiceBehavior, backtrackPercentage);
