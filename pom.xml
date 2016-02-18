@@ -169,10 +169,10 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>IBEAHH</finalName>
+                            <finalName>IBEA</finalName>
                             <archive>
                                 <manifest>
-                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tunning.IBEATuningMultiobjectiveMain</mainClass>
+                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.IBEATuningMultiobjectiveMain</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
@@ -186,10 +186,10 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>NSGAIIHH</finalName>
+                            <finalName>NSGAII</finalName>
                             <archive>
                                 <manifest>
-                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tunning.NSGAIITuningMultiobjectiveMain</mainClass>
+                                    <mainClass>edu.ufpr.cbio.psp.algorithms.tuning.NSGAIITuningMultiobjectiveMain</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>

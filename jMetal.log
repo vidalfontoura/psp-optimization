@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="windows-1252" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2016-01-24T15:40:26</date>
+  <millis>1453657226138</millis>
+  <sequence>0</sequence>
+  <logger>jMetal</logger>
+  <level>SEVERE</level>
+  <class>org.uma.jmetal.qualityindicator.util.MetricsUtil</class>
+  <method>readNonDominatedSolutionSet</method>
+  <thread>1</thread>
+  <message>org.uma.jmetal.qualityindicator.util.readNonDominatedSolutionSet: D:\work_master\psp-2D\sq8\NSGAII\EXECUTION_8\FUN.txt</message>
+  <exception>
+    <message>java.io.FileNotFoundException: D:\work_master\psp-2D\sq8\NSGAII\EXECUTION_8\FUN.txt (The system cannot find the file specified)</message>
+    <frame>
+      <class>java.io.FileInputStream</class>
+      <method>open0</method>
+    </frame>
+    <frame>
+      <class>java.io.FileInputStream</class>
+      <method>open</method>
+    </frame>
+    <frame>
+      <class>java.io.FileInputStream</class>
+      <method>&lt;init&gt;</method>
+    </frame>
+    <frame>
+      <class>java.io.FileInputStream</class>
+      <method>&lt;init&gt;</method>
+    </frame>
+    <frame>
+      <class>org.uma.jmetal.qualityindicator.util.MetricsUtil</class>
+      <method>readNonDominatedSolutionSet</method>
+      <line>309</line>
+    </frame>
+    <frame>
+      <class>edu.ufpr.cbio.psp.experiments.utils.ChapterCalculateHypervoulmeMain</class>
+      <method>main</method>
+      <line>45</line>
+    </frame>
+  </exception>
+</record>
+</log>
